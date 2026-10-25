@@ -3,10 +3,11 @@ import { Logo } from "@/components/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, MousePointerClick, Users, KanbanSquare, BarChart3, Settings, CreditCard, LogOut, ChevronsLeft, Menu } from "lucide-react";
+import { Home, MousePointerClick, Users, KanbanSquare, BarChart3, Settings, CreditCard, LogOut, ChevronsLeft, Menu, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationBell } from "@/components/painel/bell";
+import { SupportButton } from "@/components/support-button";
 
 const NAV = [
   { href: "/painel", label: "Início", icon: Home },
@@ -26,7 +27,7 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
 
   return (
     <>
-      <aside className={cn("sticky top-0 hidden h-dvh flex-col bg-[#0b1220] p-3 text-slate-300 md:flex", small ? "w-[68px]" : "w-60")}>
+      <aside className={cn("sticky top-0 z-30 hidden h-dvh flex-col bg-[#0b1220] p-3 text-slate-300 md:flex", small ? "w-[68px]" : "w-60")}>
         <div className={cn("mb-6 flex items-center px-2 pt-2", small ? "justify-center" : "justify-between")}>
           {!small && <Link href="/painel" aria-label="Início"><Logo className="text-white" /></Link>}
           <button onClick={toggle} aria-label={small ? "Abrir menu" : "Recolher menu"} className="rounded-md p-1.5 text-slate-400 hover:bg-white/10 hover:text-white">
@@ -53,6 +54,8 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
               <Link href="/painel/assinatura" className="mt-2 block rounded-lg bg-blue-500 py-2 text-center font-semibold text-white hover:bg-blue-400">Assinar</Link>
             </div>
           )}
+          <Link href="/ajuda" title={small ? "Ajuda" : undefined} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-[14.5px] hover:bg-white/5 hover:text-white", small && "justify-center px-0")}><LifeBuoy size={18} />{!small && "Ajuda"}</Link>
+          {process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP && <span title={small ? "Fale com o suporte" : undefined}><SupportButton plain compact={small} className={cn("w-full gap-3 px-3 py-2 text-[14.5px] font-normal hover:bg-white/5 hover:text-white", small && "justify-center px-0")} /></span>}
           <Link href="/painel/assinatura" title={small ? "Assinatura" : undefined} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-[14.5px] hover:bg-white/5 hover:text-white", small && "justify-center px-0")}><CreditCard size={18} />{!small && "Assinatura"}</Link>
           <ThemeToggle compact={small} className={cn("w-full py-2 text-[14.5px] text-slate-300 hover:bg-white/5 hover:text-white", small && "justify-center px-0")} />
           <form action={signOut}><button title={small ? "Sair" : undefined} className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[14.5px] hover:bg-white/5 hover:text-white", small && "justify-center px-0")}><LogOut size={18} />{!small && "Sair"}</button></form>

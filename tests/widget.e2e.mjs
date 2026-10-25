@@ -110,3 +110,44 @@ await run("validação: telefone inválido não envia", {
   assert.equal(leads.length, 0);
   assert.match(await f.locator(".e").innerText(), /WhatsApp válido/);
 });
+
+// Estruturas reais de plataformas (marcação típica gerada por cada uma)
+const before = (page, id) => page.evaluate((x) => document.getElementById("pinas-form")?.nextElementSibling?.id === x, id);
+
+await run("WordPress tema clássico (#colophon.site-footer)", {
+  mode: "both",
+  body: `<div id="page" class="site"><header id="masthead" class="site-header">menu</header><div id="content" class="site-content"><main id="main" class="site-main"><article>post</article></main></div><footer id="colophon" class="site-footer" role="contentinfo"><div class="site-info">© loja</div></footer></div>`,
+}, async ({ page }) => {
+  assert.ok(await before(page, "colophon"), "formulário deveria entrar antes do #colophon");
+  assert.equal(await page.locator("#pinas-btn").count(), 1);
+});
+
+await run("WordPress tema de blocos (footer.wp-block-template-part)", {
+  mode: "form",
+  body: `<div class="wp-site-blocks"><header class="wp-block-template-part">topo</header><main class="wp-block-group"><p>conteúdo</p></main><footer id="wpf" class="wp-block-template-part"><div class="wp-block-group">rodapé</div></footer></div>`,
+}, async ({ page }) => { assert.ok(await before(page, "wpf")); });
+
+await run("Elementor (rodapé sem tag <footer>)", {
+  mode: "form",
+  body: `<div class="elementor elementor-location-header" data-elementor-type="header">topo</div><div class="elementor" data-elementor-type="wp-page"><section class="elementor-section">página</section></div><div id="elf" class="elementor elementor-location-footer" data-elementor-type="footer"><section class="elementor-section"><div class="elementor-container">rodapé</div></section></div>`,
+}, async ({ page }) => { assert.ok(await before(page, "elf"), "formulário deveria entrar antes do rodapé do Elementor"); });
+
+await run("Wix (#SITE_FOOTER dentro de #site-root)", {
+  mode: "both",
+  body: `<div id="SITE_CONTAINER"><div id="main_MF"><div id="site-root"><header id="SITE_HEADER">topo</header><main id="PAGES_CONTAINER"><div id="SITE_PAGES">seção</div></main><footer id="SITE_FOOTER" class="wixui-footer"><div>rodapé</div></footer></div></div></div>`,
+}, async ({ page, leads }) => {
+  assert.ok(await before(page, "SITE_FOOTER"), "formulário deveria entrar antes do #SITE_FOOTER");
+  await fill(page);
+  await page.waitForTimeout(400);
+  assert.equal(leads.length, 1, "contato deveria ser enviado no Wix");
+});
+
+await run("CSS agressivo do site não quebra o formulário", {
+  mode: "form",
+  body: `<style>*{font-size:40px!important;color:red!important}input,button{display:none!important}</style><main>conteúdo</main><footer id="f2">rodapé</footer>`,
+}, async ({ page, leads }) => {
+  assert.ok(await before(page, "f2"));
+  await fill(page);
+  await page.waitForTimeout(400);
+  assert.equal(leads.length, 1, "o CSS do site não deveria esconder os campos do formulário");
+});

@@ -28,6 +28,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 10. ~~Logo~~ 25/10: nome "pinas" com pingo do i em balão + "kit" itálico (Instrument Serif) no menu/site; ícone da guia = monograma PK com estrela amarela (components/logo.tsx, app/icon.svg, public/brand/pinas-kit-icone.svg)
 
+11. ~~Opção 2 + acabamento~~ 25/10: relatórios por origem/campanha/anúncio (0006, report_by_source), responsável, etiquetas, lembrete de retorno (Início + sininho), mensagens prontas (Configurações), sininho; /ajuda pública + botão de suporte (NEXT_PUBLIC_SUPPORT_WHATSAPP, sem número → leva à ajuda); landing nova com ilustrações; e2e com marcação de WordPress, Elementor e Wix (12 ok). Visual: menu escuro, largura total, fontes +6%, gráfico de área e rosca no Início
+
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.
