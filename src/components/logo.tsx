@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 // Marca do Pinas Kit.
 // Nome: "pinas" reto com o pingo do i em forma de balão de conversa + "kit" em itálico.
 // Ícone: monograma PK com uma estrela (a chegada de um contato) — usado na guia do navegador e no menu recolhido.
@@ -18,7 +19,7 @@ export function LogoMark({ size = 28, className = "" }: { size?: number; classNa
 export function Logo({ compact, className = "" }: { size?: number; compact?: boolean; className?: string }) {
   if (compact) return <LogoMark size={30} className={className} />;
   return (
-    <span className={`inline-flex items-baseline whitespace-nowrap text-[26px] font-medium leading-none tracking-[-0.055em] text-ink ${className}`} aria-label="Pinas Kit" role="img">
+    <span className={cn("inline-flex items-baseline whitespace-nowrap text-[26px] font-medium leading-none tracking-[-0.055em] text-ink", className)} aria-label="Pinas Kit" role="img">
       p
       <span className="relative inline-block">
         ı
@@ -27,7 +28,7 @@ export function Logo({ compact, className = "" }: { size?: number; compact?: boo
         </svg>
       </span>
       nas
-      <em className="ml-px font-[family-name:var(--font-serif)] text-[1.12em] font-normal italic tracking-[-0.01em] text-primary">kit</em>
+      <em className="ml-px font-[family-name:var(--font-serif)] text-[1.12em] font-normal italic tracking-[-0.01em] text-primary [.text-white_&]:text-blue-400">kit</em>
     </span>
   );
 }

@@ -36,7 +36,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cn("rounded-xl border border-line bg-card p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]", className)}>{children}</section>;
+  return <section className={cn("rounded-2xl border border-line bg-card p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)]", className)}>{children}</section>;
 }
 
 export function Badge({ className, children }: { className?: string; children: ReactNode }) {
@@ -45,19 +45,22 @@ export function Badge({ className, children }: { className?: string; children: R
 
 export function PageHeader({ title, desc, action }: { title: string; desc: string; action?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="font-display text-2xl font-bold text-ink md:text-[28px]">{title}</h1>
-        <p className="mt-1 text-mute">{desc}</p>
+        <h1 className="font-display text-2xl font-bold text-ink">{title}</h1>
+        <p className="mt-0.5 text-[15px] text-mute">{desc}</p>
       </div>
       {action}
     </div>
   );
 }
 
-export function Empty({ title, desc, action }: { title: string; desc: string; action?: ReactNode }) {
+export function Empty({ title, desc, action, icon }: { title: string; desc: string; action?: ReactNode; icon?: ReactNode }) {
   return (
     <Card className="flex flex-col items-center py-12 text-center">
+      <span className="mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary-soft to-violet-100 text-primary ring-8 ring-primary-soft/40 dark:to-violet-950/60">
+        {icon ?? <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>}
+      </span>
       <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
       <p className="mt-1 max-w-md text-mute">{desc}</p>
       {action && <div className="mt-5">{action}</div>}

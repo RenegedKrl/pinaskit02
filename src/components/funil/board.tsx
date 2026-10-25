@@ -48,7 +48,7 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-3 flex flex-wrap gap-2">
         <label className="relative min-w-52 flex-1">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar contato pelo nome" aria-label="Buscar contato" className={`${field} w-full pl-9`} />
@@ -66,44 +66,50 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
         )}
         {active && <button onClick={() => { setQ(""); setTemp(""); setSrc(""); setPoint(""); }} className={`${field} inline-flex items-center gap-1 text-mute`}><X size={14} />Limpar</button>}
       </div>
-      <p role="status" aria-live="polite" className="mb-2 min-h-5 text-sm text-mute">{msg}</p>
+      <p role="status" aria-live="polite" className={msg ? "mb-2 text-sm text-mute" : "sr-only"}>{msg}</p>
 
       <div data-tour="quadro" className="-mx-4 overflow-x-auto px-4 pb-3 md:mx-0 md:overflow-visible md:px-0 md:pb-0">
         <div className="flex gap-3">
           {stages.map((s) => {
             const items = filtered.filter((l) => l.status === s.key);
             const sum = items.reduce((a, l) => a + Number(l.deal_value || 0), 0);
+            const accent = s.kind === "won" ? "bg-emerald-500" : s.kind === "lost" ? "bg-slate-400" : s.kind === "new" ? "bg-sky-500" : "bg-primary";
             return (
               <section key={s.key} aria-label={s.name}
                 onDragOver={(e) => { if (dragId) { e.preventDefault(); setOver(s.key); } }}
                 onDragLeave={() => setOver((o) => (o === s.key ? null : o))}
                 onDrop={(e) => { e.preventDefault(); if (dragId) move(dragId, s.key); setDragId(null); setOver(null); }}
-                className={`flex w-72 shrink-0 flex-col rounded-xl border bg-bg p-2 transition-colors md:w-auto md:min-w-0 md:flex-1 md:shrink ${over === s.key ? "border-primary bg-primary-soft/40" : "border-line"}`}>
-                <header className="flex items-start justify-between gap-2 px-1.5 pb-2 pt-1">
+                className={`relative flex w-72 shrink-0 flex-col overflow-hidden rounded-xl border bg-card/60 transition-colors md:w-auto md:min-w-0 md:flex-1 md:shrink md:min-h-[calc(100dvh-230px)] ${over === s.key ? "border-primary bg-primary-soft/30" : "border-line"}`}>
+                <span aria-hidden="true" className={`h-1 w-full ${accent}`} />
+                <header className="flex items-center justify-between gap-2 border-b border-line px-3 py-2.5">
                   <div className="min-w-0">
                     <h2 className="text-sm font-semibold leading-tight [overflow-wrap:anywhere]">{s.name}</h2>
-                    <p className="line-clamp-2 text-xs text-mute">{sum ? brl(sum) : s.hint}</p>
+                    <p className="mt-0.5 truncate text-xs text-mute" title={s.hint ?? undefined}>{sum ? brl(sum) : s.hint}</p>
                   </div>
-                  <span className="rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-mute">{items.length}</span>
+                  <span className="grid h-6 min-w-6 place-items-center rounded-md bg-bg px-1.5 text-xs font-semibold tabular-nums text-mute">{items.length}</span>
                 </header>
-                <div className="max-h-[calc(100dvh-300px)] min-h-24 space-y-2 overflow-y-auto pr-0.5">
+                <div className="flex-1 space-y-2 overflow-y-auto p-2 md:max-h-[calc(100dvh-290px)]">
                   {items.slice(0, PER_COLUMN).map((l) => {
                     const t = TEMP[l.temperature as keyof typeof TEMP];
                     return (
                       <article key={l.id} draggable={edit} onDragStart={(e) => { setDragId(l.id); e.dataTransfer.effectAllowed = "move"; }} onDragEnd={() => { setDragId(null); setOver(null); }}
-                        className={`rounded-lg border border-line bg-card p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${edit ? "cursor-grab active:cursor-grabbing" : ""} ${dragId === l.id ? "opacity-50" : ""}`}>
-                        <Link href={`/painel/contatos/${l.id}`} className="line-clamp-2 block font-semibold leading-snug hover:text-primary [overflow-wrap:anywhere]">{l.name || "Sem nome"}</Link>
+                        className={`group rounded-lg border border-line bg-card p-2.5 transition hover:border-primary/40 hover:shadow-sm ${edit ? "cursor-grab active:cursor-grabbing" : ""} ${dragId === l.id ? "opacity-40" : ""}`}>
+                        <Link href={`/painel/contatos/${l.id}`} className="line-clamp-2 block text-sm font-semibold leading-snug hover:text-primary [overflow-wrap:anywhere]">{l.name || "Sem nome"}</Link>
                         <p className="mt-0.5 truncate text-xs text-mute">{l.source_label || "Acesso direto"}</p>
                         <div className="mt-2 flex items-center justify-between gap-2">
-                          {t && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${t.cls}`}>{t.label} · {l.score}</span>}
-                          {l.deal_value ? <span className="text-xs font-semibold">{brl(Number(l.deal_value))}</span> : null}
+                          {t && <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${t.cls}`}>{t.label} · {l.score}</span>}
+                          {l.deal_value ? <span className="text-xs font-semibold tabular-nums">{brl(Number(l.deal_value))}</span> : null}
                         </div>
                         {edit && <div className="mt-2 md:hidden"><StatusSelect id={l.id} status={l.status} stages={stages} className="w-full" /></div>}
                       </article>
                     );
                   })}
                   {items.length > PER_COLUMN && <p className="px-1 text-xs text-mute">Mostrando {PER_COLUMN} de {items.length}. Use a busca ou os filtros para achar os outros.</p>}
-                  {!items.length && <p className="rounded-lg border border-dashed border-line p-4 text-center text-xs text-mute">{active ? "Nenhum contato com esses filtros" : edit ? "Arraste um contato para cá" : "Nenhum contato"}</p>}
+                  {!items.length && (
+                    <p className={`grid place-items-center rounded-lg border border-dashed p-4 text-center text-xs transition-colors ${dragId ? "border-primary/50 text-primary" : "border-transparent text-mute/70"}`}>
+                      {dragId ? "Solte aqui" : active ? "Nenhum contato com esses filtros" : "Nenhum contato"}
+                    </p>
+                  )}
                 </div>
               </section>
             );

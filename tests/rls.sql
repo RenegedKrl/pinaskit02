@@ -88,6 +88,28 @@ do $$ begin
 end $$;
 reset role;
 
+-- mensagens prontas, responsável, etiquetas e relatório (0006)
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000a', true);
+insert into message_templates (workspace_id, name, body)
+  select workspace_id, 'Oi', 'Olá {nome}!' from t_ws where user_id = '00000000-0000-0000-0000-00000000000a';
+update leads set tags = array['vip'], next_followup_at = now(), owner_id = '00000000-0000-0000-0000-00000000000a';
+do $$ begin
+  if (select owner_id from leads) <> '00000000-0000-0000-0000-00000000000a' then raise exception 'não definiu responsável'; end if;
+  begin update leads set owner_id = '00000000-0000-0000-0000-00000000000b'; raise exception 'responsável de outra conta';
+  exception when raise_exception then if sqlerrm = 'responsável de outra conta' then raise; end if; end;
+  if (select count(*) from report_by_source((select workspace_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000a'), now() - interval '1 day')) <> 1 then
+    raise exception 'relatório não trouxe o contato de A'; end if;
+end $$;
+select mark_notifications_seen();
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000b', true);
+do $$ begin
+  if (select count(*) from message_templates) <> 0 then raise exception 'B vê mensagens prontas de A'; end if;
+  if (select count(*) from report_by_source((select workspace_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000a'), now() - interval '1 day')) <> 0 then
+    raise exception 'B vê o relatório de A'; end if;
+end $$;
+reset role;
+
 -- viewer não edita
 update workspace_members set role = 'viewer' where user_id = '00000000-0000-0000-0000-00000000000b';
 set local role authenticated;

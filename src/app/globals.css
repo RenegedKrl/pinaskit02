@@ -6,7 +6,7 @@
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
   --color-primary-soft: #dbeafe;
-  --color-bg: #f6f7f9;
+  --color-bg: #f2f5f9;
   --color-card: #ffffff;
   --color-ink: #0f172a;
   --color-mute: #475569;
@@ -38,7 +38,8 @@
   --color-emerald-700: #6ee7b7; --color-emerald-800: #a7f3d0;
 }
 
-html { -webkit-text-size-adjust: 100%; }
+/* letras ~6% maiores no site todo (tudo em rem acompanha) */
+html { -webkit-text-size-adjust: 100%; font-size: 106.25%; }
 body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); font-feature-settings: "cv11", "ss01"; }
 h1, h2, h3, .font-display { letter-spacing: -0.015em; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
