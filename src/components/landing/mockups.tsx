@@ -26,7 +26,7 @@ export function DashboardMock() {
       </div>
       <div className="mt-3 rounded-lg border border-line p-3">
         <p className="text-[11px] font-semibold">Contatos por dia</p>
-        <svg viewBox="0 0 240 70" className="mt-2 h-20 w-full" aria-hidden="true">
+        <svg viewBox="0 0 240 70" preserveAspectRatio="none" className="mt-2 h-24 w-full" aria-hidden="true">
           <defs><linearGradient id="lm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#6366f1" stopOpacity=".4" /><stop offset="1" stopColor="#6366f1" stopOpacity="0" /></linearGradient></defs>
           <path d={`M0,${70 - bars[0] * 2} ${bars.map((b, i) => `L${(i * 240) / 11},${70 - b * 2}`).join(" ")} L240,70 L0,70Z`} fill="url(#lm)" />
           <path d={`M0,${70 - bars[0] * 2} ${bars.map((b, i) => `L${(i * 240) / 11},${70 - b * 2}`).join(" ")}`} fill="none" stroke="#6366f1" strokeWidth="2" />
@@ -96,5 +96,30 @@ export function PhoneMock() {
       <div className="h-6 rounded-b-lg bg-slate-800" />
       <span className="absolute -right-5 bottom-3 grid h-12 w-12 ring-4 ring-white dark:ring-slate-900 place-items-center rounded-full bg-[#25D366] text-white shadow-lg"><WhatsAppIcon size={22} /></span>
     </div>
+  );
+}
+
+/** Ficha do contato: origem, jornada e lembrete. */
+export function ContactMock() {
+  return (
+    <Frame label="Ficha do contato">
+      <div className="flex items-start justify-between gap-2">
+        <div><p className="text-sm font-bold">Ana Souza</p><p className="text-[11px] text-mute">+55 (11) 9 8765-4321 · Google Ads</p></div>
+        <span className="flex items-center gap-1 rounded-md bg-[#25D366] px-2 py-1 text-[10px] font-bold text-white"><WhatsAppIcon size={11} />WhatsApp</span>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-[10px]">
+        <div className="rounded-lg border border-line p-2"><p className="text-mute">Campanha</p><p className="font-semibold">promo-outubro</p></div>
+        <div className="rounded-lg border border-line p-2"><p className="text-mute">Temperatura</p><p className="font-semibold text-amber-600">Quente · 48</p></div>
+      </div>
+      <div className="mt-3 rounded-lg border border-line p-2.5">
+        <p className="text-[10px] font-semibold">Jornada no site</p>
+        <ul className="mt-1.5 space-y-1 border-l-2 border-primary-soft pl-2 text-[10px] text-mute">
+          <li><b className="text-ink">22/10</b> · veio do Google Ads · /servicos</li>
+          <li><b className="text-ink">24/10</b> · voltou pelo Instagram · /precos</li>
+          <li><b className="text-ink">24/10</b> · preencheu o formulário</li>
+        </ul>
+      </div>
+      <div className="mt-3 flex items-center gap-2 rounded-lg bg-amber-50 px-2.5 py-2 text-[10px] font-semibold text-amber-900">⏰ Retornar hoje às 15:00 · mandar orçamento</div>
+    </Frame>
   );
 }
