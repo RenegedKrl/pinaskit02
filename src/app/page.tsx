@@ -39,7 +39,7 @@ const FOOTER = [
 export default function Home() {
   const support = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "").replace(/\D/g, "");
   return (
-    <div className="overflow-x-hidden bg-card">
+    <div className="overflow-x-clip bg-card">
       <header className="sticky top-0 z-40 border-b border-line/70 bg-card/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
           <Link href="/"><Logo /></Link>
