@@ -6,7 +6,7 @@ import { getNotifications, markNotificationsSeen, type Notifications } from "@/a
 import { cn, dateTime } from "@/lib/utils";
 
 /** Sininho de avisos: contatos novos desde a última olhada e retornos de hoje. Atualiza a cada minuto. */
-export function NotificationBell({ className = "" }: { className?: string }) {
+export function NotificationBell({ className = "", menu, compact }: { className?: string; menu?: boolean; compact?: boolean }) {
   const [data, setData] = useState<Notifications | null>(null);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -33,12 +33,14 @@ export function NotificationBell({ className = "" }: { className?: string }) {
   return (
     <div ref={ref} className={cn("relative", className)}>
       <button onClick={toggle} aria-label={`Avisos${count ? `: ${count} novos` : ""}`} aria-expanded={open}
-        className="relative grid size-10 place-items-center rounded-full border border-line bg-card text-ink transition-colors hover:border-primary/40 hover:text-primary">
-        {count ? <BellRing size={18} className="text-amber-500" /> : <Bell size={18} />}
-        {count > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white ring-2 ring-card">{count > 99 ? "99+" : count}</span>}
+        className={menu
+          ? cn("relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[14.5px] font-medium hover:bg-white/5 hover:text-white", compact && "justify-center px-0")
+          : "relative grid size-10 place-items-center rounded-full border border-line bg-card text-ink transition-colors hover:border-primary/40 hover:text-primary"}>
+        {count ? <BellRing size={18} className={menu ? "text-amber-300" : "text-amber-500"} /> : <Bell size={18} />}{menu && !compact && "Avisos"}
+        {count > 0 && <span className={cn("grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white", menu && !compact ? "ml-auto" : "absolute -right-1 -top-1 ring-2 ring-card")}>{count > 99 ? "99+" : count}</span>}
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-2 text-ink shadow-2xl">
+        <div className={cn("absolute z-50 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-2 text-ink shadow-2xl", menu ? "left-full top-0 ml-2" : "right-0 top-full mt-2")}>
           <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-mute">Avisos</p>
           {!!data?.followups && (
             <Link href="/painel/contatos?retorno=pendente" onClick={() => setOpen(false)} className="mb-1 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900 hover:brightness-95">

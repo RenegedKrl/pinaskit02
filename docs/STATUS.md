@@ -34,6 +34,7 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 13. ~~Landing estilo Kommo~~ 25/10: hero centralizado com ícones de canais → WhatsApp, vitrine com abas (Capte/Organize/Atenda/Analise, components/landing/showcase.tsx), bento colorido, preços com períodos, CTA escuro e rodapé em colunas. Sem logos/depoimentos inventados
 14. ~~Painel estilo Livento~~ 25/10: menu lateral trocado por barra no topo (components/painel/topbar.tsx) com abas em pílula, avisos/ajuda redondos e menu da conta (assinatura, suporte, tema, sair); cards mais arredondados
+16. ~~Escolha de layout~~ 25/10: Configurações › Aparência do painel (layout-picker.tsx) alterna menu no topo / lateral; fica no cookie pk-layout (por navegador), lido no layout do painel
 15. ~~Velocidade~~ 25/10: Vercel (iad1) e Supabase (us-east-1) na mesma região — não mudar só um. Consultas de Contatos e ficha em paralelo; getSession usa getClaims (sem 2ª ida ao Auth). Contatos ~2,2 s → ~0,9 s no teste local
 
 ## Decisões

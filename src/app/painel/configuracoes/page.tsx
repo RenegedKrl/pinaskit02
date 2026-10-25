@@ -1,5 +1,7 @@
 import { canEdit, getSession, isAdmin } from "@/lib/session";
+import { cookies } from "next/headers";
 import { TemplatesManager } from "@/components/painel/templates-manager";
+import { LayoutPicker } from "@/components/painel/layout-picker";
 import { Button, Card, Field, Input, PageHeader, Select } from "@/components/ui";
 import { addDomain, deleteData, invite, removeDomain, removeInvite, removeMember, saveBusiness } from "./actions";
 
@@ -17,7 +19,8 @@ export default async function Config() {
 
   return (
     <>
-      <PageHeader title="Configurações" desc="Dados do negócio, sites autorizados, equipe e mensagens prontas." />
+      <PageHeader title="Configurações" desc="Aparência, dados do negócio, sites autorizados, equipe e mensagens prontas." />
+      <div className="mb-4"><LayoutPicker current={(await cookies()).get("pk-layout")?.value === "lateral" ? "lateral" : "topo"} /></div>
       <div className="mb-4"><TemplatesManager templates={templates ?? []} edit={canEdit(role)} /></div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
