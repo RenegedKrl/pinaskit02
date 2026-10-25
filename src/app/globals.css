@@ -3,32 +3,32 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #7c3aed;
-  --color-primary-hover: #6d28d9;
-  --color-primary-soft: #ede9fe;
-  --color-bg: #f8f7fc;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #dbeafe;
+  --color-bg: #f6f7f9;
   --color-card: #ffffff;
-  --color-ink: #18152c;
-  --color-mute: #57536b;
-  --color-line: #e4e1ee;
+  --color-ink: #0f172a;
+  --color-mute: #475569;
+  --color-line: #e2e8f0;
   --color-success: #10b981;
   --color-success-soft: #d1fae5;
   --color-warn: #f59e0b;
-  --font-display: var(--font-poppins), system-ui, sans-serif;
+  --font-display: var(--font-inter), system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
 /* Tema escuro: troca as cores-base e inverte os tons claros/escuros usados em avisos e etiquetas. */
 .dark {
   color-scheme: dark;
-  --color-primary: #8b5cf6;
-  --color-primary-hover: #a78bfa;
-  --color-primary-soft: #2e2550;
-  --color-bg: #0f0d17;
-  --color-card: #1a1726;
-  --color-ink: #ece9f6;
-  --color-mute: #a9a3bf;
-  --color-line: #2e2a3d;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-soft: #172554;
+  --color-bg: #0b1018;
+  --color-card: #121a24;
+  --color-ink: #e5eaf2;
+  --color-mute: #94a3b8;
+  --color-line: #1f2a37;
   --color-success-soft: #0f3a2c;
   --color-amber-50: #33270b; --color-amber-100: #3f300d;
   --color-amber-800: #fcd34d; --color-amber-900: #fde68a;
@@ -39,5 +39,6 @@
 }
 
 html { -webkit-text-size-adjust: 100%; }
-body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); }
+body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); font-feature-settings: "cv11", "ss01"; }
+h1, h2, h3, .font-display { letter-spacing: -0.015em; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }

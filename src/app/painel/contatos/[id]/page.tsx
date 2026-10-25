@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { canEdit, getSession, isAdmin } from "@/lib/session";
-import { METHOD_LABEL, statusLabel, TEMP } from "@/lib/copy";
+import { METHOD_LABEL, TEMP } from "@/lib/copy";
+import { getStages, stageName } from "@/lib/stages";
 import { dateTime, formatPhone } from "@/lib/utils";
 import { WhatsAppIcon, Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { Journey, type PageView } from "@/components/contatos/journey";
@@ -39,6 +40,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
     ? await supabase.from("events").select("page_url, source_label, created_at").eq("workspace_id", workspace.id)
         .eq("visitor_id", l.visitor_id).eq("type", "pageview").order("created_at").limit(200)
     : { data: [] as PageView[] };
+  const stages = await getStages(supabase, workspace.id);
   const edit = canEdit(role);
   const t = TEMP[l.temperature as keyof typeof TEMP];
   const firstName = (l.name || "").split(" ")[0];
@@ -60,7 +62,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
         <div className="space-y-4 lg:col-span-2">
           <Card>
             <h2 className="font-display font-semibold">Etapa do atendimento</h2>
-            <StatusButtons id={l.id} status={l.status} disabled={!edit} />
+            <StatusButtons id={l.id} status={l.status} stages={stages} disabled={!edit} />
           </Card>
           <Card>
             <h2 className="mb-3 font-display font-semibold">De onde veio</h2>
@@ -92,7 +94,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
               {(acts ?? []).map((a) => (
                 <li key={a.id} className="border-l-2 border-primary-soft pl-3 text-sm">
                   <p className="text-mute">{dateTime(a.created_at)}</p>
-                  <p>{a.type === "note" ? a.body?.text : a.type === "status_change" ? `Etapa: ${statusLabel(a.body?.from)} → ${statusLabel(a.body?.to)}` : a.type === "form_submit" ? `Enviou o formulário (${METHOD_LABEL[a.body?.method] ?? "site"})${a.body?.url ? ` em ${a.body.url}` : ""}` : a.type}</p>
+                  <p>{a.type === "note" ? a.body?.text : a.type === "status_change" ? `Etapa: ${stageName(stages, a.body?.from)} → ${stageName(stages, a.body?.to)}` : a.type === "form_submit" ? `Enviou o formulário (${METHOD_LABEL[a.body?.method] ?? "site"})${a.body?.url ? ` em ${a.body.url}` : ""}` : a.type}</p>
                 </li>
               ))}
             </ul>

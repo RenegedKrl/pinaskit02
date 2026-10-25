@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { canEdit, getSession } from "@/lib/session";
-import { STATUS, statusLabel, TEMP } from "@/lib/copy";
+import { TEMP } from "@/lib/copy";
+import { getStages, stageName } from "@/lib/stages";
 import { dateTime, formatPhone } from "@/lib/utils";
 import { Badge, Card, Empty, Input, PageHeader, Select } from "@/components/ui";
 import { StatusSelect } from "@/components/contatos/status-select";
@@ -18,6 +19,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
       .eq("workspace_id", workspace.id), f);
   const { data: leads, count } = await q.order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1);
   const { data: srcRows } = await supabase.from("leads").select("source_label").eq("workspace_id", workspace.id).limit(1000);
+  const stages = await getStages(supabase, workspace.id);
   const { data: points } = await supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name");
   const sources = [...new Set((srcRows ?? []).map((r) => r.source_label).filter(Boolean))] as string[];
   const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag" && k !== "ok") as [string, string][]).toString();
@@ -39,7 +41,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
         {!!points?.length && <Select name="ponto" defaultValue={f.ponto ?? ""} aria-label="Ponto de contato"><option value="">Todos os pontos de contato</option>{points!.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>}
         <Select name="temp" defaultValue={f.temp ?? ""} aria-label="Temperatura"><option value="">Toda temperatura</option>{Object.entries(TEMP).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}</Select>
         <div className="flex gap-2">
-          <Select name="status" defaultValue={f.status ?? ""} aria-label="Etapa"><option value="">Todas as etapas</option>{STATUS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</Select>
+          <Select name="status" defaultValue={f.status ?? ""} aria-label="Etapa"><option value="">Todas as etapas</option>{stages.map((s) => <option key={s.key} value={s.key}>{s.name}</option>)}</Select>
           <button className="rounded-lg bg-primary px-4 font-semibold text-white">Filtrar</button>
         </div>
       </form>
@@ -60,7 +62,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
                     <td className="px-4 py-3"><a className="text-emerald-700 hover:underline" target="_blank" rel="noopener" href={`https://wa.me/${l.phone_e164}`}>{formatPhone(l.phone_e164)}</a></td>
                     <td className="px-4 py-3">{l.source_label || "Acesso direto"}</td>
                     <td className="px-4 py-3"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label} · {l.score}</Badge></td>
-                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} disabled={!edit} /></td>
+                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} stages={stages} disabled={!edit} /></td>
                     <td className="px-4 py-3 text-mute">{dateTime(l.created_at)}</td>
                   </tr>
                 ))}
@@ -72,7 +74,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
               <Link key={l.id} href={`/painel/contatos/${l.id}`} className="block rounded-2xl border border-line bg-card p-4">
                 <div className="flex justify-between"><span className="font-semibold">{l.name || "Sem nome"}</span><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label}</Badge></div>
                 <p className="text-sm text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.created_at)}</p>
-                <p className="text-sm">{statusLabel(l.status)}</p>
+                <p className="text-sm">{stageName(stages, l.status)}</p>
               </Link>
             ))}
           </div>

@@ -36,7 +36,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cn("rounded-2xl border border-line bg-card p-5 shadow-[0_1px_2px_rgba(24,21,44,0.04)]", className)}>{children}</section>;
+  return <section className={cn("rounded-xl border border-line bg-card p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]", className)}>{children}</section>;
 }
 
 export function Badge({ className, children }: { className?: string; children: ReactNode }) {

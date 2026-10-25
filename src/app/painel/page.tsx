@@ -3,6 +3,7 @@ import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { getSession } from "@/lib/session";
 import { since } from "@/lib/utils";
 import { Card, PageHeader } from "@/components/ui";
+import { Tutorial } from "@/components/painel/tutorial";
 
 interface Stats {
   views: number; clicks: number; leads: number; waiting: number; won: number;
@@ -50,10 +51,13 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         title={`Olá${name ? `, ${name}` : ""}!`}
         desc="Veja como estão chegando os contatos do seu negócio."
         action={
+          <div className="flex flex-wrap items-center gap-2">
+          <Tutorial />
           <div className="flex gap-1 rounded-lg border border-line bg-card p-1 text-sm" role="group" aria-label="Período">
             {[7, 30, 90].map((d) => (
               <Link key={d} href={`/painel?p=${d}`} className={`rounded-md px-3 py-1.5 ${d === days ? "bg-primary text-white" : "text-mute"}`}>{d} dias</Link>
             ))}
+          </div>
           </div>
         }
       />

@@ -2,22 +2,22 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { canEdit, getSession, isAdmin } from "@/lib/session";
-import { STATUS, statusLabel } from "@/lib/copy";
 
-const VALID = new Set<string>(STATUS.map((s) => s.id));
 
-export async function setStatus(fd: FormData) {
+/** Muda a etapa do contato. A etapa precisa existir na conta (o banco recusa as outras). */
+export async function setStatus(fd: FormData): Promise<{ ok: boolean }> {
   const { supabase, workspace, role, user } = await getSession();
   const id = String(fd.get("id")), status = String(fd.get("status"));
-  if (!canEdit(role) || !VALID.has(status)) return;
+  if (!canEdit(role) || !/^[a-z0-9_]{2,40}$/.test(status)) return { ok: false };
   const { data: old } = await supabase.from("leads").select("status").eq("id", id).eq("workspace_id", workspace.id).single();
-  if (!old || old.status === status) return;
-  await supabase.from("leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id).eq("workspace_id", workspace.id);
+  if (!old) return { ok: false };
+  if (old.status === status) return { ok: true };
+  const { error } = await supabase.from("leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id).eq("workspace_id", workspace.id);
+  if (error) return { ok: false };
   await supabase.from("lead_activities").insert({ workspace_id: workspace.id, lead_id: id, user_id: user.id, type: "status_change", body: { from: old.status, to: status } });
   // invalida todo o painel (ficha, lista, funil): sem isso a tela continuava mostrando a etapa antiga
   revalidatePath("/painel", "layout");
-  const back = String(fd.get("back") || "");
-  if (back.startsWith("/painel")) redirect(`${back}${back.includes("?") ? "&" : "?"}ok=${encodeURIComponent(`Movido para ${statusLabel(status)}`)}`);
+  return { ok: true };
 }
 
 export async function updateLead(fd: FormData) {
