@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { canEdit, getSession, isAdmin } from "@/lib/session";
 import { METHOD_LABEL, STATUS, statusLabel, TEMP } from "@/lib/copy";
 import { dateTime, formatPhone } from "@/lib/utils";
-import { Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
+import { WhatsAppIcon, Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { Journey, type PageView } from "@/components/contatos/journey";
 import { addNote, deleteLead, setStatus, updateLead } from "../actions";
 
@@ -51,7 +51,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
           <p className="text-mute">{formatPhone(l.phone_e164)} · chegou em {dateTime(l.created_at)}</p>
         </div>
         <a href={`https://wa.me/${l.phone_e164}?text=${encodeURIComponent(`Olá${firstName ? `, ${firstName}` : ""}! Tudo bem?`)}`} target="_blank" rel="noopener"
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-success px-5 font-semibold text-white"><MessageCircle size={18} />Abrir no WhatsApp</a>
+          className="inline-flex h-11 items-center gap-2 rounded-lg bg-success px-5 font-semibold text-white"><WhatsAppIcon size={18} />Abrir no WhatsApp</a>
       </div>
       <p className="-mt-4 mb-6 text-sm text-mute">O WhatsApp abre no seu celular ou computador. O Pinas Kit não lê suas conversas.</p>
 
@@ -59,13 +59,17 @@ export default async function Contato({ params }: { params: Promise<{ id: string
         <div className="space-y-4 lg:col-span-2">
           <Card>
             <h2 className="font-display font-semibold">Etapa do atendimento</h2>
-            <form action={setStatus} className="mt-3 flex flex-wrap gap-2">
-              <input type="hidden" name="id" value={l.id} />
+            <div className="mt-3 flex flex-wrap gap-2">
               {STATUS.map((s) => (
-                <button key={s.id} name="status" value={s.id} disabled={!edit} title={s.hint}
+                <form key={s.id} action={setStatus}>
+                <input type="hidden" name="id" value={l.id} />
+                <input type="hidden" name="status" value={s.id} />
+                <input type="hidden" name="back" value={`/painel/contatos/${l.id}`} />
+                <button disabled={!edit} title={s.hint}
                   className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${l.status === s.id ? "border-primary bg-primary text-white" : "border-line bg-card hover:border-primary"}`}>{s.label}</button>
+                </form>
               ))}
-            </form>
+            </div>
           </Card>
           <Card>
             <h2 className="mb-3 font-display font-semibold">De onde veio</h2>

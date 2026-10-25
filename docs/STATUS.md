@@ -20,6 +20,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 7. ~~Contatos + tema~~ 25/10: filtro por ponto de contato, etapa editável na lista, jornada do visitante na ficha (`components/contatos/`), tema claro/escuro (token `card`, `.dark` em globals.css, botão no menu e na landing)
 
+8. 25/10: botões de etapa da ficha corrigidos (um form por etapa) e logo oficial do WhatsApp no "Abrir no WhatsApp" (`WhatsAppIcon` em ui.tsx). Próximo: telas de carregamento/erro, adaptar tests/rls.sql a banco com dados
+
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.
