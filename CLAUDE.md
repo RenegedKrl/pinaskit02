@@ -2,6 +2,9 @@
 
 SaaS brasileiro: widget de WhatsApp (botão flutuante e/ou formulário antes do rodapé) que captura contatos com origem (UTM) + CRM simples. Concorrente de referência: CentralKit.
 
+## Idioma (OBRIGATÓRIO)
+- Fale com o dono SEMPRE em português do Brasil: respostas, resumos, perguntas, botões e caixas de próximo passo. Nunca em inglês, nem em textos curtos.
+
 ## Regras de economia de contexto (OBRIGATÓRIO)
 - NÃO leia o projeto inteiro. Leia só `docs/STATUS.md` + o doc do módulo da tarefa:
   - widget/script/formulário → `docs/widget.md`
