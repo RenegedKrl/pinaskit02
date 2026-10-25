@@ -1,6 +1,7 @@
 // POST /asaas-webhook → atualiza o plano do workspace. Configure no Asaas: URL desta função +
 // token de autenticação igual a ASAAS_WEBHOOK_TOKEN. Só este webhook muda plan_status.
 import { db, json } from "../_shared/http.ts";
+import { accessUntilOnCancel } from "../_shared/billing.ts";
 
 const ASAAS = Deno.env.get("ASAAS_BASE_URL") || "https://api-sandbox.asaas.com/v3";
 
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
 
   const sub: string | undefined = ev.payment?.subscription ?? ev.subscription?.id;
   const customer: string | undefined = ev.payment?.customer ?? ev.subscription?.customer;
-  let q = db().from("workspaces").select("id");
+  let q = db().from("workspaces").select("id, current_period_end, trial_ends_at");
   q = sub ? q.eq("asaas_subscription_id", sub) : q.eq("asaas_customer_id", customer ?? "-");
   const { data: ws } = await q.maybeSingle();
   if (!ws) return json({ ok: true, ignored: true });
@@ -43,7 +44,8 @@ Deno.serve(async (req) => {
       break;
     case "SUBSCRIPTION_DELETED":
     case "SUBSCRIPTION_INACTIVATED":
-      patch = { plan_status: "canceled" };
+      // quem cancela durante o teste mantém o acesso até o fim do teste (ou do período pago)
+      patch = { plan_status: "canceled", current_period_end: accessUntilOnCancel(ws.current_period_end, ws.trial_ends_at) };
       break;
   }
   if (patch) await db().from("workspaces").update(patch).eq("id", ws.id);

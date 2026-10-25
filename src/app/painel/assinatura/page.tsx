@@ -31,7 +31,7 @@ export default async function Assinatura({ searchParams }: { searchParams: Promi
       <PageHeader title="Assinatura" desc="Um plano só, com tudo liberado. Cancele quando quiser." />
       {sp.erro && <p role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-red-800">{sp.erro}</p>}
       {sp.ok && <p className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-800">Assinatura criada. Assim que o pagamento for confirmado, seu plano fica ativo.</p>}
-      {sp.cancelada && <p className="mb-4 rounded-lg bg-bg px-4 py-3">Assinatura cancelada. Você continua com acesso até o fim do período já pago.</p>}
+      {sp.cancelada && <p className="mb-4 rounded-lg bg-bg px-4 py-3">Assinatura cancelada. Você continua com acesso até o fim do período já pago ou do teste grátis, o que for mais tarde.</p>}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <Card>
@@ -42,7 +42,7 @@ export default async function Assinatura({ searchParams }: { searchParams: Promi
           <p className="mt-3 font-display text-3xl font-bold">{brl(PLAN.monthly)}<span className="text-base font-normal text-mute">/mês</span></p>
           <p className="text-mute">ou {brl(PLAN.yearly)}/ano (sai {brl(PLAN.yearlyPerMonth)}/mês)</p>
           {w.plan_status === "trial" && <p className="mt-2 text-sm">Restam <b>{trialDaysLeft(w)}</b> dias de teste. Se assinar agora, a 1ª cobrança vence só no fim do teste.</p>}
-          {w.current_period_end && w.plan_status !== "trial" && <p className="mt-2 text-sm text-mute">Período atual até {new Date(w.current_period_end).toLocaleDateString("pt-BR")}.</p>}
+          {w.current_period_end && w.plan_status !== "trial" && <p className="mt-2 text-sm text-mute">{w.plan_status === "canceled" ? "Acesso até" : "Período atual até"} {new Date(w.current_period_end).toLocaleDateString("pt-BR")}.</p>}
           <ul className="mt-4 space-y-2">
             {PLAN.features.map((f) => <li key={f} className="flex gap-2 text-[15px]"><Check size={18} className="mt-0.5 shrink-0 text-success" />{f}</li>)}
           </ul>
