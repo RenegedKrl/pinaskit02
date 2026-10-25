@@ -15,7 +15,7 @@ function CopyBox({ text, label }: { text: string; label: string }) {
           {ok ? <><Check size={15} />Copiado</> : <><Copy size={15} />Copiar</>}
         </button>
       </div>
-      <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-ink p-3 text-xs text-white">{text}</pre>
+      <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-slate-900 p-3 text-xs text-slate-100 dark:bg-slate-950">{text}</pre>
     </div>
   );
 }
@@ -36,12 +36,12 @@ Regras:
 - Opcional: se quiser escolher onde o formulário aparece, coloque <div data-pinas-form></div> nesse lugar. Sem isso, ele entra automaticamente antes do rodapé.`;
   return (
     <div className="space-y-4">
-      <div className={`rounded-lg p-3 text-sm ${installed ? "bg-success-soft text-emerald-800" : "bg-amber-50 text-amber-900"}`}>
+      <div className={`rounded-lg border p-3 text-sm ${installed ? "border-emerald-200 bg-success-soft text-emerald-800 dark:border-emerald-900" : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800"}`}>
         {installed ? "Instalação detectada: seu site já está enviando dados." : "Ainda não detectamos a instalação. Depois de colar o código, abra seu site e clique em Verificar."}
       </div>
-      <div className="flex gap-1 rounded-lg bg-bg p-1 text-sm" role="tablist">
-        <button type="button" role="tab" aria-selected={tab === "code"} onClick={() => setTab("code")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "code" ? "bg-card shadow-sm" : "text-mute"}`}>Código</button>
-        <button type="button" role="tab" aria-selected={tab === "ai"} onClick={() => setTab("ai")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "ai" ? "bg-card shadow-sm" : "text-mute"}`}>Pedir para uma IA</button>
+      <div className="flex gap-1 rounded-lg border border-line bg-bg p-1 text-sm" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === "code"} onClick={() => setTab("code")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "code" ? "bg-card shadow-sm dark:bg-line" : "text-mute"}`}>Código</button>
+        <button type="button" role="tab" aria-selected={tab === "ai"} onClick={() => setTab("ai")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "ai" ? "bg-card shadow-sm dark:bg-line" : "text-mute"}`}>Pedir para uma IA</button>
       </div>
       {tab === "code" ? (
         <>

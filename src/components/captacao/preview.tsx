@@ -26,12 +26,12 @@ export function Preview({ mode, c }: { mode: Mode; c: WidgetConfig }) {
     <div>
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-semibold">Prévia</span>
-        <div className="flex gap-1 rounded-lg border border-line bg-white p-0.5">
+        <div className="flex gap-1 rounded-lg border border-line bg-card p-0.5">
           <button type="button" aria-label="Computador" onClick={() => setMobile(false)} className={`rounded-md p-1.5 ${!mobile ? "bg-primary-soft text-primary" : "text-mute"}`}><Monitor size={16} /></button>
           <button type="button" aria-label="Celular" onClick={() => setMobile(true)} className={`rounded-md p-1.5 ${mobile ? "bg-primary-soft text-primary" : "text-mute"}`}><Smartphone size={16} /></button>
         </div>
       </div>
-      <div className={`mx-auto overflow-hidden rounded-xl border border-line bg-white ${mobile ? "max-w-[300px]" : ""}`}>
+      <div className={`mx-auto overflow-hidden rounded-xl border border-line bg-card ${mobile ? "max-w-[300px]" : ""}`}>
         <div className="flex items-center gap-1.5 border-b border-line bg-bg px-3 py-2">
           <i className="size-2.5 rounded-full bg-red-300" /><i className="size-2.5 rounded-full bg-amber-300" /><i className="size-2.5 rounded-full bg-emerald-300" />
           <span className="ml-2 text-xs text-mute">seusite.com.br</span>
