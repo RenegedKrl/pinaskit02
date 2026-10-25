@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { canEdit, getSession } from "@/lib/session";
@@ -14,7 +15,7 @@ export default async function EditWidget({ params, searchParams }: { params: Pro
   const { supabase, workspace, role } = await getSession();
   const { data: w } = await supabase.from("widgets").select("*").eq("id", id).eq("workspace_id", workspace.id).maybeSingle();
   if (!w) notFound();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const appUrl = await widgetBaseUrl();
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
   return (
     <>
@@ -36,4 +37,16 @@ export default async function EditWidget({ params, searchParams }: { params: Pro
       ) : <p className="text-mute">Você tem acesso só de visualização.</p>}
     </>
   );
+}
+
+// Endereço público de onde o site do cliente baixa o w.js. Nunca pode ser localhost:
+// um site real não acessa o computador de quem copiou o código.
+const PUBLIC_APP_URL = "https://pinaskit.vercel.app";
+async function widgetBaseUrl(): Promise<string> {
+  const env = process.env.NEXT_PUBLIC_APP_URL;
+  if (env && !/localhost|127\.0\.0\.1/.test(env)) return env.replace(/\/$/, "");
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  if (host && !/localhost|127\.0\.0\.1/.test(host)) return `https://${host}`;
+  return PUBLIC_APP_URL;
 }
