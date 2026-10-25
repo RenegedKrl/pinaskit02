@@ -22,7 +22,6 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
   const sources = [...new Set((srcRows ?? []).map((r) => r.source_label).filter(Boolean))] as string[];
   const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag" && k !== "ok") as [string, string][]).toString();
   const total = count ?? 0;
-  const back = `/painel/contatos${qs || page > 1 ? `?${[qs, page > 1 ? `pag=${page}` : ""].filter(Boolean).join("&")}` : ""}`;
   const edit = canEdit(role);
 
   return (
@@ -61,7 +60,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
                     <td className="px-4 py-3"><a className="text-emerald-700 hover:underline" target="_blank" rel="noopener" href={`https://wa.me/${l.phone_e164}`}>{formatPhone(l.phone_e164)}</a></td>
                     <td className="px-4 py-3">{l.source_label || "Acesso direto"}</td>
                     <td className="px-4 py-3"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label} · {l.score}</Badge></td>
-                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} back={back} disabled={!edit} /></td>
+                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} disabled={!edit} /></td>
                     <td className="px-4 py-3 text-mute">{dateTime(l.created_at)}</td>
                   </tr>
                 ))}

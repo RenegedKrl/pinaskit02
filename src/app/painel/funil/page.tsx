@@ -3,8 +3,8 @@ import { canEdit, getSession } from "@/lib/session";
 import { STATUS, TEMP } from "@/lib/copy";
 import { brl } from "@/lib/plan";
 import { dateTime } from "@/lib/utils";
-import { Badge, PageHeader, Select } from "@/components/ui";
-import { setStatus } from "../contatos/actions";
+import { Badge, PageHeader } from "@/components/ui";
+import { StatusSelect } from "@/components/contatos/status-select";
 
 export default async function Funil({ searchParams }: { searchParams: Promise<{ ok?: string }> }) {
   const { ok } = await searchParams;
@@ -35,14 +35,7 @@ export default async function Funil({ searchParams }: { searchParams: Promise<{ 
                     <p className="text-xs text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.updated_at)}</p>
                     <div className="mt-1"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label}</Badge></div>
                     {edit && (
-                      <form action={setStatus} className="mt-2 flex gap-1">
-                        <input type="hidden" name="id" value={l.id} />
-                        <input type="hidden" name="back" value="/painel/funil" />
-                        <Select name="status" defaultValue={l.status} aria-label="Mover para" className="py-1.5 text-sm">
-                          {STATUS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
-                        </Select>
-                        <button className="rounded-lg bg-primary px-2.5 text-sm font-semibold text-white">Mover</button>
-                      </form>
+                      <div className="mt-2"><StatusSelect id={l.id} status={l.status} /></div>
                     )}
                   </div>
                 ))}

@@ -14,8 +14,8 @@ export async function setStatus(fd: FormData) {
   if (!old || old.status === status) return;
   await supabase.from("leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id).eq("workspace_id", workspace.id);
   await supabase.from("lead_activities").insert({ workspace_id: workspace.id, lead_id: id, user_id: user.id, type: "status_change", body: { from: old.status, to: status } });
-  revalidatePath("/painel/funil");
-  revalidatePath(`/painel/contatos/${id}`);
+  // invalida todo o painel (ficha, lista, funil): sem isso a tela continuava mostrando a etapa antiga
+  revalidatePath("/painel", "layout");
   const back = String(fd.get("back") || "");
   if (back.startsWith("/painel")) redirect(`${back}${back.includes("?") ? "&" : "?"}ok=${encodeURIComponent(`Movido para ${statusLabel(status)}`)}`);
 }
