@@ -1,3 +1,4 @@
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -11,7 +12,7 @@ export function AuthShell({ title, desc, children, sp }: { title: string; desc: 
     <main className="grid min-h-dvh md:grid-cols-2">
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-          <Link href="/" className="font-display text-xl font-bold text-primary">Pinas Kit</Link>
+          <Link href="/"><Logo /></Link>
           <h1 className="mt-8 font-display text-2xl font-bold">{title}</h1>
           <p className="mb-6 mt-1 text-mute">{desc}</p>
           {sp.erro && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{sp.erro}</p>}

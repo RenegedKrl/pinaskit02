@@ -1,4 +1,5 @@
 "use client";
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,7 +26,7 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
     <>
       <aside className={cn("sticky top-0 hidden h-dvh flex-col border-r border-line bg-card p-3 md:flex", small ? "w-[68px]" : "w-60")}>
         <div className="mb-6 flex items-center justify-between px-2 pt-2">
-          {!small && <span className="font-display text-lg font-bold text-primary">Pinas Kit</span>}
+          <Logo compact={small} />
           <button onClick={toggle} aria-label={small ? "Abrir menu" : "Recolher menu"} className="rounded-md p-1.5 text-mute hover:bg-primary-soft">
             {small ? <Menu size={18} /> : <ChevronsLeft size={18} />}
           </button>

@@ -26,6 +26,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 9. ~~Funil editável + design + tutorial~~ 25/10: etapas por conta (0005_stages, máx 10, novo/ganho/perdido fixas, delete_stage move contatos), funil com arrastar, busca e filtros (components/funil), design azul profissional (Inter), tour guiado de 12 passos (escurece a tela, destaca o ponto, balão com seta, segue as páginas; 1ª visita ou botão Tutorial) e boas-vindas única ao ativar a assinatura. tests/rls.sql agora roda em banco com dados: RLS OK
 
+10. ~~Logo~~ 25/10: marca "P" com cabeça de alfinete (components/logo.tsx, public/brand/pinas-kit-marca.svg, app/icon.svg como ícone da aba)
+
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.

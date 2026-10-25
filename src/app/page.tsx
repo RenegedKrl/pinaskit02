@@ -1,3 +1,4 @@
+import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { BarChart3, Check, FormInput, MessageCircle, MousePointerClick, Route, Users } from "lucide-react";
@@ -28,7 +29,7 @@ export default function Home() {
   return (
     <div className="bg-card">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
-        <Link href="/" className="font-display text-xl font-bold text-primary">Pinas Kit</Link>
+        <Link href="/"><Logo /></Link>
         <nav className="flex items-center gap-2 text-[15px]">
           <a href="#preco" className="hidden px-3 py-2 text-mute sm:block">Preço</a>
           <ThemeToggle compact />

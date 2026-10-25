@@ -1,3 +1,4 @@
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 
 // Endereço que não existe (ou contato/botão de outra conta).
@@ -5,7 +6,7 @@ export default function NaoEncontrado() {
   return (
     <main className="grid min-h-dvh place-items-center px-4">
       <div className="max-w-md text-center">
-        <p className="font-display text-lg font-bold text-primary">Pinas Kit</p>
+        <Logo className="justify-center" />
         <h1 className="mt-4 font-display text-2xl font-bold">Página não encontrada</h1>
         <p className="mt-2 text-mute">O endereço pode estar errado, ou o item foi apagado.</p>
         <div className="mt-6 flex justify-center gap-2">
