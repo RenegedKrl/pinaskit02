@@ -68,7 +68,7 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
       </div>
       <p role="status" aria-live="polite" className="mb-2 min-h-5 text-sm text-mute">{msg}</p>
 
-      <div data-tour="quadro" className="-mx-4 overflow-x-auto px-4 pb-3 md:-mx-0 md:px-0">
+      <div data-tour="quadro" className="-mx-4 overflow-x-auto px-4 pb-3 md:mx-0 md:overflow-visible md:px-0 md:pb-0">
         <div className="flex gap-3">
           {stages.map((s) => {
             const items = filtered.filter((l) => l.status === s.key);
@@ -78,11 +78,11 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
                 onDragOver={(e) => { if (dragId) { e.preventDefault(); setOver(s.key); } }}
                 onDragLeave={() => setOver((o) => (o === s.key ? null : o))}
                 onDrop={(e) => { e.preventDefault(); if (dragId) move(dragId, s.key); setDragId(null); setOver(null); }}
-                className={`flex w-72 shrink-0 flex-col rounded-xl border bg-bg p-2 transition-colors ${over === s.key ? "border-primary bg-primary-soft/40" : "border-line"}`}>
+                className={`flex w-72 shrink-0 flex-col rounded-xl border bg-bg p-2 transition-colors md:w-auto md:min-w-0 md:flex-1 md:shrink ${over === s.key ? "border-primary bg-primary-soft/40" : "border-line"}`}>
                 <header className="flex items-start justify-between gap-2 px-1.5 pb-2 pt-1">
                   <div className="min-w-0">
-                    <h2 className="truncate text-sm font-semibold">{s.name}</h2>
-                    <p className="truncate text-xs text-mute">{sum ? brl(sum) : s.hint}</p>
+                    <h2 className="text-sm font-semibold leading-tight [overflow-wrap:anywhere]">{s.name}</h2>
+                    <p className="line-clamp-2 text-xs text-mute">{sum ? brl(sum) : s.hint}</p>
                   </div>
                   <span className="rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-mute">{items.length}</span>
                 </header>
@@ -92,7 +92,7 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
                     return (
                       <article key={l.id} draggable={edit} onDragStart={(e) => { setDragId(l.id); e.dataTransfer.effectAllowed = "move"; }} onDragEnd={() => { setDragId(null); setOver(null); }}
                         className={`rounded-lg border border-line bg-card p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${edit ? "cursor-grab active:cursor-grabbing" : ""} ${dragId === l.id ? "opacity-50" : ""}`}>
-                        <Link href={`/painel/contatos/${l.id}`} className="block truncate font-semibold hover:text-primary">{l.name || "Sem nome"}</Link>
+                        <Link href={`/painel/contatos/${l.id}`} className="line-clamp-2 block font-semibold leading-snug hover:text-primary [overflow-wrap:anywhere]">{l.name || "Sem nome"}</Link>
                         <p className="mt-0.5 truncate text-xs text-mute">{l.source_label || "Acesso direto"}</p>
                         <div className="mt-2 flex items-center justify-between gap-2">
                           {t && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${t.cls}`}>{t.label} · {l.score}</span>}
