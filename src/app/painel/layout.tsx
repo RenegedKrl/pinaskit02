@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Sidebar } from "@/components/painel/sidebar";
 import { Tour } from "@/components/painel/tour";
 import { Welcome } from "@/components/painel/welcome";
+import { NotificationBell } from "@/components/painel/bell";
 import { getSession, trialDaysLeft } from "@/lib/session";
 import { signOut } from "@/app/entrar/actions";
 
@@ -26,6 +27,7 @@ export default async function PainelLayout({ children }: { children: React.React
           </div>
         )}
         <main className="w-full px-4 py-5 md:px-6 md:py-6 xl:px-8">{children}</main>
+        <div className="fixed right-3 top-3 z-40 rounded-full bg-[#0b1220] text-slate-300 shadow-lg md:hidden"><NotificationBell compact className="[&>button]:h-10 [&>button]:w-10" /></div>
         <Tour />
         <Welcome workspaceId={w.id} active={w.plan_status === "active"} />
       </div>

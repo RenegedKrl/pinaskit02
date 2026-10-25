@@ -8,6 +8,8 @@ import { dateTime, formatPhone } from "@/lib/utils";
 import { WhatsAppIcon, Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { Journey, type PageView } from "@/components/contatos/journey";
 import { StatusButtons } from "@/components/contatos/status-buttons";
+import { CrmPanel, type Member } from "@/components/contatos/crm-panel";
+import { TemplateMenu, type Template } from "@/components/contatos/template-menu";
 import { addNote, deleteLead, updateLead } from "../actions";
 
 type Touch = { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string; referrer?: string; landing?: string; click_ids?: Record<string, string> } | null;
@@ -32,7 +34,7 @@ function TouchInfo({ title, t }: { title: string; t: Touch }) {
 
 export default async function Contato({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, workspace, role } = await getSession();
+  const { supabase, workspace, role, user } = await getSession();
   const { data: l } = await supabase.from("leads").select("*, widgets(name)").eq("id", id).eq("workspace_id", workspace.id).maybeSingle();
   if (!l) notFound();
   const { data: acts } = await supabase.from("lead_activities").select("id, type, body, created_at").eq("lead_id", id).order("created_at", { ascending: false }).limit(50);
@@ -41,6 +43,10 @@ export default async function Contato({ params }: { params: Promise<{ id: string
         .eq("visitor_id", l.visitor_id).eq("type", "pageview").order("created_at").limit(200)
     : { data: [] as PageView[] };
   const stages = await getStages(supabase, workspace.id);
+  const [{ data: members }, { data: templates }] = await Promise.all([
+    supabase.from("workspace_members").select("user_id, email").eq("workspace_id", workspace.id).neq("role", "viewer"),
+    supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
+  ]);
   const edit = canEdit(role);
   const t = TEMP[l.temperature as keyof typeof TEMP];
   const firstName = (l.name || "").split(" ")[0];
@@ -53,8 +59,11 @@ export default async function Contato({ params }: { params: Promise<{ id: string
           <h1 className="font-display text-2xl font-bold">{l.name || "Sem nome"}</h1>
           <p className="text-mute">{formatPhone(l.phone_e164)} · chegou em {dateTime(l.created_at)}</p>
         </div>
+        <div className="flex flex-wrap gap-2">
+        <TemplateMenu phone={l.phone_e164} lead={{ name: l.name, source_label: l.source_label }} templates={(templates ?? []) as Template[]} />
         <a href={`https://wa.me/${l.phone_e164}?text=${encodeURIComponent(`Olá${firstName ? `, ${firstName}` : ""}! Tudo bem?`)}`} target="_blank" rel="noopener"
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-success px-5 font-semibold text-white"><WhatsAppIcon size={18} />Abrir no WhatsApp</a>
+        </div>
       </div>
       <p className="-mt-4 mb-6 text-sm text-mute">O WhatsApp abre no seu celular ou computador. O Pinas Kit não lê suas conversas.</p>
 
@@ -94,13 +103,15 @@ export default async function Contato({ params }: { params: Promise<{ id: string
               {(acts ?? []).map((a) => (
                 <li key={a.id} className="border-l-2 border-primary-soft pl-3 text-sm">
                   <p className="text-mute">{dateTime(a.created_at)}</p>
-                  <p>{a.type === "note" ? a.body?.text : a.type === "status_change" ? `Etapa: ${stageName(stages, a.body?.from)} → ${stageName(stages, a.body?.to)}` : a.type === "form_submit" ? `Enviou o formulário (${METHOD_LABEL[a.body?.method] ?? "site"})${a.body?.url ? ` em ${a.body.url}` : ""}` : a.type}</p>
+                  <p>{a.type === "note" ? a.body?.text : a.type === "status_change" ? `Etapa: ${stageName(stages, a.body?.from)} → ${stageName(stages, a.body?.to)}` : a.type === "owner_change" ? (a.body?.to ? `Responsável: ${(members ?? []).find((m) => m.user_id === a.body.to)?.email ?? "alguém da equipe"}` : "Responsável removido") : a.type === "followup" ? `Lembrete de retorno para ${dateTime(a.body?.at)}${a.body?.note ? `: ${a.body.note}` : ""}` : a.type === "form_submit" ? `Enviou o formulário (${METHOD_LABEL[a.body?.method] ?? "site"})${a.body?.url ? ` em ${a.body.url}` : ""}` : a.type}</p>
                 </li>
               ))}
             </ul>
           </Card>
         </div>
         <div className="space-y-4">
+          <CrmPanel id={l.id} ownerId={l.owner_id} tags={l.tags ?? []} followupAt={l.next_followup_at} followupNote={l.followup_note}
+            members={(members ?? []) as Member[]} me={user.id} edit={edit} />
           <Card>
             <p className="text-sm text-mute">Temperatura</p>
             <p className="mt-1"><Badge className={t?.cls}>{t?.label} · {l.score} pontos</Badge></p>

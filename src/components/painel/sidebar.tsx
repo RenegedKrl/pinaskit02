@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Home, MousePointerClick, Users, KanbanSquare, BarChart3, Settings, CreditCard, LogOut, ChevronsLeft, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/painel/bell";
 
 const NAV = [
   { href: "/painel", label: "Início", icon: Home },
@@ -43,6 +44,7 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
             </Link>
           ))}
         </nav>
+        <NotificationBell compact={small} className="mt-1" />
         <div className="mt-auto space-y-1">
           {trialText && !small && (
             <div className="mb-2 rounded-xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-violet-500/10 p-3 text-sm">

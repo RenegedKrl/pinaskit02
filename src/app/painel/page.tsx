@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { CheckCircle2, Circle, ArrowRight, Eye, MousePointerClick, Trophy, Users } from "lucide-react";
+import { CheckCircle2, Circle, ArrowRight, BellRing, Eye, MousePointerClick, Trophy, Users } from "lucide-react";
 import { getSession } from "@/lib/session";
 import { since } from "@/lib/utils";
 import { Card, PageHeader } from "@/components/ui";
 import { Tutorial } from "@/components/painel/tutorial";
+import { AreaChart, Donut } from "@/components/painel/charts";
 
 interface Stats {
   views: number; clicks: number; leads: number; waiting: number; won: number;
@@ -15,10 +16,14 @@ const pct = (a: number, b: number) => (b ? `${Math.min(100, (a / b) * 100).toFix
 export default async function Inicio({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const { supabase, user, workspace } = await getSession();
   const days = [7, 30, 90].includes(Number((await searchParams).p)) ? Number((await searchParams).p) : 30;
-  const [{ data: widgets }, { data: s }, { count: total }] = await Promise.all([
+  // fim do dia no horário de Brasília (o servidor roda em UTC)
+  const endOfToday = new Date(Date.now() - 3 * 3600e3); endOfToday.setUTCHours(23, 59, 59, 999); endOfToday.setTime(endOfToday.getTime() + 3 * 3600e3);
+  const [{ data: widgets }, { data: s }, { count: total }, { data: followups }] = await Promise.all([
     supabase.from("widgets").select("id, first_seen_at").eq("workspace_id", workspace.id),
     supabase.rpc("dashboard_stats", { p_ws: workspace.id, p_from: since(days) }),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("workspace_id", workspace.id),
+    supabase.from("leads").select("id, name, next_followup_at, followup_note").eq("workspace_id", workspace.id)
+      .not("next_followup_at", "is", null).lte("next_followup_at", endOfToday.toISOString()).order("next_followup_at").limit(8),
   ]);
   const st = (s ?? { views: 0, clicks: 0, leads: 0, waiting: 0, won: 0, sources: [], daily: [] }) as Stats;
   const hasWidget = !!widgets?.length;
@@ -42,8 +47,6 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
     { done: hasLead, label: "Receber o primeiro contato" },
   ];
   const doneCount = steps.filter((x) => x.done).length;
-  const maxDay = Math.max(1, ...st.daily.map((d) => d.total));
-  const maxSrc = Math.max(1, ...st.sources.map((d) => d.total));
 
   return (
     <>
@@ -89,6 +92,26 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         </div>
       )}
 
+      {!!followups?.length && (
+        <Card className="mb-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 font-semibold"><span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"><BellRing size={16} /></span>Retornos para hoje</h2>
+            <Link href="/painel/contatos?retorno=pendente" className="text-sm font-semibold text-primary">Ver todos</Link>
+          </div>
+          <ul className="divide-y divide-line">
+            {followups.map((f) => {
+              const late = new Date(f.next_followup_at!).getTime() < Date.now();
+              return (
+                <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                  <Link href={`/painel/contatos/${f.id}`} className="font-medium hover:text-primary">{f.name || "Sem nome"}{f.followup_note && <span className="font-normal text-mute"> · {f.followup_note}</span>}</Link>
+                  <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${late ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-900"}`}>{late ? "Atrasado" : "Hoje"} · {new Date(f.next_followup_at!).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { l: "Pessoas que viram", v: st.views, h: "Viram seu botão ou formulário", i: Eye, c: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" },
@@ -107,26 +130,11 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
       <div className="mt-4 grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <h2 className="font-display font-semibold">Contatos por dia</h2>
-          {st.daily.length ? (
-            <div className="mt-4 flex h-40 items-end gap-1" role="img" aria-label="Contatos recebidos por dia">
-              {st.daily.map((d) => (
-                <div key={d.day} title={`${d.day.split("-").reverse().join("/")}: ${d.total}`} className="max-w-10 flex-1 rounded-t-md bg-gradient-to-t from-primary to-violet-500 opacity-90 hover:opacity-100" style={{ height: `${(d.total / maxDay) * 100}%`, minHeight: 4 }} />
-              ))}
-            </div>
-          ) : <p className="mt-4 text-mute">Quando chegarem contatos, o gráfico aparece aqui.</p>}
+          {st.daily.length ? <div className="mt-2"><AreaChart daily={st.daily} days={days} /></div> : <p className="mt-4 text-mute">Quando chegarem contatos, o gráfico aparece aqui.</p>}
         </Card>
         <Card className="lg:col-span-2">
-          <h2 className="font-display font-semibold">De onde vieram</h2>
-          {st.sources.length ? (
-            <ul className="mt-4 space-y-3">
-              {st.sources.map((x) => (
-                <li key={x.label}>
-                  <div className="flex justify-between text-[15px]"><span>{x.label}</span><span className="font-semibold">{x.total}</span></div>
-                  <div className="mt-1 h-2 rounded-full bg-primary-soft"><div className="h-2 rounded-full bg-gradient-to-r from-primary to-violet-500" style={{ width: `${(x.total / maxSrc) * 100}%` }} /></div>
-                </li>
-              ))}
-            </ul>
-          ) : <p className="mt-4 text-mute">Ainda sem contatos neste período.</p>}
+          <h2 className="font-display font-semibold">Origem dos contatos</h2>
+          {st.sources.length ? <div className="mt-4"><Donut sources={st.sources} /></div> : <p className="mt-4 text-mute">Ainda sem contatos neste período.</p>}
         </Card>
       </div>
     </>

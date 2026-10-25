@@ -1,4 +1,5 @@
-import { getSession, isAdmin } from "@/lib/session";
+import { canEdit, getSession, isAdmin } from "@/lib/session";
+import { TemplatesManager } from "@/components/painel/templates-manager";
 import { Button, Card, Field, Input, PageHeader, Select } from "@/components/ui";
 import { addDomain, deleteData, invite, removeDomain, removeInvite, removeMember, saveBusiness } from "./actions";
 
@@ -7,15 +8,17 @@ const ROLES: Record<string, string> = { owner: "Dono", admin: "Administrador", m
 export default async function Config() {
   const { supabase, workspace, role, user } = await getSession();
   const admin = isAdmin(role);
-  const [{ data: sites }, { data: members }, { data: invites }] = await Promise.all([
+  const [{ data: sites }, { data: members }, { data: invites }, { data: templates }] = await Promise.all([
     supabase.from("sites").select("id, domain").eq("workspace_id", workspace.id).order("domain"),
     supabase.from("workspace_members").select("user_id, role, email").eq("workspace_id", workspace.id),
     admin ? supabase.from("invites").select("id, email, role").eq("workspace_id", workspace.id) : Promise.resolve({ data: [] as { id: string; email: string; role: string }[] }),
+    supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
   ]);
 
   return (
     <>
-      <PageHeader title="Configurações" desc="Dados do negócio, sites autorizados e equipe." />
+      <PageHeader title="Configurações" desc="Dados do negócio, sites autorizados, equipe e mensagens prontas." />
+      <div className="mb-4"><TemplatesManager templates={templates ?? []} edit={canEdit(role)} /></div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h2 className="mb-4 font-display font-semibold">Seu negócio</h2>
