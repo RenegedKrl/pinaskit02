@@ -30,8 +30,10 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 11. ~~Opção 2 + acabamento~~ 25/10: relatórios por origem/campanha/anúncio (0006, report_by_source), responsável, etiquetas, lembrete de retorno (Início + sininho), mensagens prontas (Configurações), sininho; /ajuda pública + botão de suporte (NEXT_PUBLIC_SUPPORT_WHATSAPP, sem número → leva à ajuda); landing nova com ilustrações; e2e com marcação de WordPress, Elementor e Wix (12 ok). Visual: menu escuro, largura total, fontes +6%, gráfico de área e rosca no Início
 
+12. ~~Períodos~~ 25/10: mensal R$ 49,90, trimestral R$ 139,90 (-7%), semestral R$ 269,90 (-10%), anual R$ 499 (-17%) — CYCLES em lib/plan.ts; seletor na landing e 4 opções na Assinatura (Asaas QUARTERLY/SEMIANNUALLY). Suporte: NEXT_PUBLIC_SUPPORT_WHATSAPP=5511934726972 (na Vercel ainda não entrou no build)
+
 ## Decisões
-- Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
+- Um plano em 4 períodos (mensal, trimestral, semestral, anual), 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.
 
 ## Pendências do dono

@@ -1,7 +1,7 @@
 import { Check, ExternalLink } from "lucide-react";
 import { getSession, isAdmin, trialDaysLeft } from "@/lib/session";
 import { asaas, PAY_STATUS, type AsaasPayment } from "@/lib/asaas";
-import { brl, PLAN } from "@/lib/plan";
+import { brl, PLAN, CYCLES, discount, everyText, perMonth } from "@/lib/plan";
 import { Badge, Button, Card, Field, Input, PageHeader } from "@/components/ui";
 import { cancel, subscribe } from "./actions";
 
@@ -55,15 +55,15 @@ export default async function Assinatura({ searchParams }: { searchParams: Promi
               <form action={subscribe} className="space-y-4">
                 <fieldset>
                   <legend className="mb-2 text-sm font-semibold">Período</legend>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label className="cursor-pointer rounded-lg border border-line p-3 has-checked:border-primary has-checked:bg-primary-soft/50">
-                      <input type="radio" name="cycle" value="MONTHLY" defaultChecked className="sr-only" />
-                      <b>Mensal</b><br /><span className="text-sm text-mute">{brl(PLAN.monthly)}/mês</span>
-                    </label>
-                    <label className="cursor-pointer rounded-lg border border-line p-3 has-checked:border-primary has-checked:bg-primary-soft/50">
-                      <input type="radio" name="cycle" value="YEARLY" className="sr-only" />
-                      <b>Anual</b> <span className="text-xs font-semibold text-success">-17%</span><br /><span className="text-sm text-mute">{brl(PLAN.yearly)}/ano</span>
-                    </label>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {CYCLES.map((c, i) => (
+                      <label key={c.id} className="relative cursor-pointer rounded-lg border border-line p-3 has-checked:border-primary has-checked:bg-primary-soft/50">
+                        <input type="radio" name="cycle" value={c.id} defaultChecked={i === 0} className="sr-only" />
+                        <b>{c.label}</b>{discount(c) > 0 && <span className="ml-1 text-xs font-semibold text-success">-{discount(c)}%</span>}
+                        <br /><span className="text-sm text-mute">{brl(c.price)} {everyText(c.months)}</span>
+                        {c.months > 1 && <><br /><span className="text-xs text-mute">sai {brl(perMonth(c))}/mês</span></>}
+                      </label>
+                    ))}
                   </div>
                 </fieldset>
                 <fieldset>

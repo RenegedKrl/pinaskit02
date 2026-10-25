@@ -18,3 +18,17 @@ test("cupom", () => {
   assert.equal(couponPercent("AMIGO20"), 20);
   assert.equal(couponPercent("nada"), -1);
 });
+
+import { CYCLES, cycleById, discount, perMonth } from "../src/lib/plan.ts";
+
+test("períodos: preço por mês e desconto em relação ao mensal", () => {
+  const [m, q, s, y] = CYCLES;
+  assert.deepEqual(CYCLES.map((c) => c.id), ["MONTHLY", "QUARTERLY", "SEMIANNUALLY", "YEARLY"]);
+  assert.equal(perMonth(m), 49.9);
+  assert.equal(perMonth(q), 46.63);
+  assert.equal(perMonth(s), 44.98);
+  assert.equal(perMonth(y), 41.58);
+  assert.deepEqual([discount(m), discount(q), discount(s), discount(y)], [0, 7, 10, 17]);
+  assert.equal(cycleById("SEMIANNUALLY").price, 269.9);
+  assert.equal(cycleById("hack").id, "MONTHLY", "ciclo desconhecido cai no mensal");
+});

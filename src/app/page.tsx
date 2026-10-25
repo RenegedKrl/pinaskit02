@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, BellRing, Check, FormInput, KanbanSquare, MessageSquareText, MousePointerClick, Route, ShieldCheck, Users, X } from "lucide-react";
+import { ArrowRight, BarChart3, BellRing, Check, FormInput, KanbanSquare, MessageSquareText, MousePointerClick, Route, Users, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DashboardMock, FunnelMock, PhoneMock, ReportMock } from "@/components/landing/mockups";
-import { brl, PLAN } from "@/lib/plan";
+import { Pricing } from "@/components/landing/pricing";
 
 const features = [
   { i: Route, c: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300", t: "Origem de cada contato", d: "Guardamos UTMs e cliques do Google e do Meta, do primeiro ao último acesso." },
@@ -115,16 +115,10 @@ export default function Home() {
       </section>
 
       <section id="preco" className="border-y border-line bg-bg py-20">
-        <div className="mx-auto max-w-md px-4">
-          <h2 className="text-center text-3xl font-bold tracking-tight">Um preço, tudo liberado</h2>
-          <div className="mt-8 rounded-2xl border-2 border-primary bg-card p-8 shadow-xl shadow-primary/10">
-            <p className="text-lg font-semibold">Plano {PLAN.name}</p>
-            <p className="mt-2 text-4xl font-bold">{brl(PLAN.monthly)}<span className="text-base font-normal text-mute">/mês</span></p>
-            <p className="text-mute">ou {brl(PLAN.yearly)}/ano ({brl(PLAN.yearlyPerMonth)}/mês)</p>
-            <ul className="mt-6 space-y-2">{PLAN.features.map((f) => <li key={f} className="flex gap-2"><Check size={18} className="mt-1 shrink-0 text-emerald-500" />{f}</li>)}</ul>
-            <Link href="/criar-conta" className="mt-8 block rounded-xl bg-primary py-3.5 text-center text-lg font-semibold text-white hover:bg-primary-hover">Testar 7 dias grátis</Link>
-            <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-mute"><ShieldCheck size={15} />Cartão, PIX ou boleto</p>
-          </div>
+        <div className="mx-auto max-w-2xl px-4">
+          <h2 className="text-center text-3xl font-bold tracking-tight">Um plano, tudo liberado</h2>
+          <p className="mt-2 text-center text-mute">Escolha o período. Quanto mais longo, maior o desconto.</p>
+          <Pricing />
         </div>
       </section>
 
