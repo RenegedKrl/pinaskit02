@@ -33,6 +33,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 12. ~~Períodos~~ 25/10: mensal R$ 49,90, trimestral R$ 139,90 (-7%), semestral R$ 269,90 (-10%), anual R$ 499 (-17%) — CYCLES em lib/plan.ts; seletor na landing e 4 opções na Assinatura (Asaas QUARTERLY/SEMIANNUALLY). Suporte: NEXT_PUBLIC_SUPPORT_WHATSAPP=5511934726972 (na Vercel ainda não entrou no build)
 
 13. ~~Landing estilo Kommo~~ 25/10: hero centralizado com ícones de canais → WhatsApp, vitrine com abas (Capte/Organize/Atenda/Analise, components/landing/showcase.tsx), bento colorido, preços com períodos, CTA escuro e rodapé em colunas. Sem logos/depoimentos inventados
+14. ~~Painel estilo Livento~~ 25/10: menu lateral trocado por barra no topo (components/painel/topbar.tsx) com abas em pílula, avisos/ajuda redondos e menu da conta (assinatura, suporte, tema, sair); cards mais arredondados
+15. ~~Velocidade~~ 25/10: Vercel (iad1) e Supabase (us-east-1) na mesma região — não mudar só um. Consultas de Contatos e ficha em paralelo; getSession usa getClaims (sem 2ª ida ao Auth). Contatos ~2,2 s → ~0,9 s no teste local
 
 ## Decisões
 - Um plano em 4 períodos (mensal, trimestral, semestral, anual), 7 dias grátis sem cartão. Asaas apenas.

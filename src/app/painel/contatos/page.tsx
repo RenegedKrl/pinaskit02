@@ -17,11 +17,13 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
   const { q, days } = applyFilters(
     supabase.from("leads").select("id, name, phone_e164, email, source_label, status, temperature, score, created_at, tags, next_followup_at, widgets(name)", { count: "exact" })
       .eq("workspace_id", workspace.id), { ...f, me: user.id });
-  const { data: leads, count } = await q.order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1);
-  const { data: srcRows } = await supabase.from("leads").select("source_label, tags").eq("workspace_id", workspace.id).limit(1000);
+  const [{ data: leads, count }, { data: srcRows }, stages, { data: points }] = await Promise.all([
+    q.order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1),
+    supabase.from("leads").select("source_label, tags").eq("workspace_id", workspace.id).limit(1000),
+    getStages(supabase, workspace.id),
+    supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name"),
+  ]);
   const allTags = [...new Set((srcRows ?? []).flatMap((r) => r.tags ?? []))].sort() as string[];
-  const stages = await getStages(supabase, workspace.id);
-  const { data: points } = await supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name");
   const sources = [...new Set((srcRows ?? []).map((r) => r.source_label).filter(Boolean))] as string[];
   const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag" && k !== "ok") as [string, string][]).toString();
   const total = count ?? 0;

@@ -35,18 +35,18 @@ function TouchInfo({ title, t }: { title: string; t: Touch }) {
 export default async function Contato({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, workspace, role, user } = await getSession();
-  const { data: l } = await supabase.from("leads").select("*, widgets(name)").eq("id", id).eq("workspace_id", workspace.id).maybeSingle();
+  const [{ data: l }, { data: acts }, stages, { data: members }, { data: templates }] = await Promise.all([
+    supabase.from("leads").select("*, widgets(name)").eq("id", id).eq("workspace_id", workspace.id).maybeSingle(),
+    supabase.from("lead_activities").select("id, type, body, created_at").eq("lead_id", id).order("created_at", { ascending: false }).limit(50),
+    getStages(supabase, workspace.id),
+    supabase.from("workspace_members").select("user_id, email").eq("workspace_id", workspace.id).neq("role", "viewer"),
+    supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
+  ]);
   if (!l) notFound();
-  const { data: acts } = await supabase.from("lead_activities").select("id, type, body, created_at").eq("lead_id", id).order("created_at", { ascending: false }).limit(50);
   const { data: views } = l.visitor_id
     ? await supabase.from("events").select("page_url, source_label, created_at").eq("workspace_id", workspace.id)
         .eq("visitor_id", l.visitor_id).eq("type", "pageview").order("created_at").limit(200)
     : { data: [] as PageView[] };
-  const stages = await getStages(supabase, workspace.id);
-  const [{ data: members }, { data: templates }] = await Promise.all([
-    supabase.from("workspace_members").select("user_id, email").eq("workspace_id", workspace.id).neq("role", "viewer"),
-    supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
-  ]);
   const edit = canEdit(role);
   const t = TEMP[l.temperature as keyof typeof TEMP];
   const firstName = (l.name || "").split(" ")[0];

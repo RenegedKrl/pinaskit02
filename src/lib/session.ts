@@ -11,8 +11,11 @@ export interface Workspace {
 /** Usuário, workspace e papel atuais. Redireciona para /entrar se não houver sessão. */
 export const getSession = cache(async () => {
   const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/entrar");
+  // getClaims valida a assinatura do token sem ida ao servidor de login (o middleware já renovou a sessão).
+  const { data } = await supabase.auth.getClaims();
+  const c = data?.claims;
+  if (!c?.sub) redirect("/entrar");
+  const user = { id: c.sub, email: c.email as string | undefined, user_metadata: (c.user_metadata ?? {}) as Record<string, unknown> };
   const { data: m } = await supabase.from("workspace_members")
     .select("role, workspaces(id, name, plan_status, trial_ends_at, current_period_end, privacy_policy_url, whatsapp_support, asaas_subscription_id)")
     .eq("user_id", user.id).limit(1).single();
