@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./node_modules/**)",
+      "Read(./.next/**)",
+      "Read(./dist/**)",
+      "Read(./public/w.js)",
+      "Read(./package-lock.json)",
+      "Read(./pnpm-lock.yaml)",
+      "Read(./supabase/.temp/**)",
+      "Read(./coverage/**)",
+      "Read(./playwright-report/**)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+# Configuração do Supabase CLI. As funções públicas não exigem login (o widget roda no site do cliente).
+project_id = "pinas-kit"
+
+[functions.w-config]
+verify_jwt = false
+
+[functions.w-events]
+verify_jwt = false
+
+[functions.w-lead]
+verify_jwt = false
+
+[functions.b-redirect]
+verify_jwt = false
+
+[functions.asaas-webhook]
+verify_jwt = false
+
+[functions.trial-reminder]
+verify_jwt = false
