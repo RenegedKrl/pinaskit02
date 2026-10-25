@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #7c3aed;
   --color-primary-hover: #6d28d9;
   --color-primary-soft: #ede9fe;
   --color-bg: #f8f7fc;
+  --color-card: #ffffff;
   --color-ink: #18152c;
   --color-mute: #57536b;
   --color-line: #e4e1ee;
@@ -13,6 +16,26 @@
   --color-warn: #f59e0b;
   --font-display: var(--font-poppins), system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Tema escuro: troca as cores-base e inverte os tons claros/escuros usados em avisos e etiquetas. */
+.dark {
+  color-scheme: dark;
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #a78bfa;
+  --color-primary-soft: #2e2550;
+  --color-bg: #0f0d17;
+  --color-card: #1a1726;
+  --color-ink: #ece9f6;
+  --color-mute: #a9a3bf;
+  --color-line: #2e2a3d;
+  --color-success-soft: #0f3a2c;
+  --color-amber-50: #33270b; --color-amber-100: #3f300d;
+  --color-amber-800: #fcd34d; --color-amber-900: #fde68a;
+  --color-red-50: #3a1418; --color-red-100: #4a1a1f; --color-red-200: #5c2228;
+  --color-red-700: #fca5a5; --color-red-800: #fecaca;
+  --color-emerald-50: #0f3a2c;
+  --color-emerald-700: #6ee7b7; --color-emerald-800: #a7f3d0;
 }
 
 html { -webkit-text-size-adjust: 100%; }

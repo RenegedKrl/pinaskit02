@@ -40,8 +40,8 @@ Regras:
         {installed ? "Instalação detectada: seu site já está enviando dados." : "Ainda não detectamos a instalação. Depois de colar o código, abra seu site e clique em Verificar."}
       </div>
       <div className="flex gap-1 rounded-lg bg-bg p-1 text-sm" role="tablist">
-        <button type="button" role="tab" aria-selected={tab === "code"} onClick={() => setTab("code")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "code" ? "bg-white shadow-sm" : "text-mute"}`}>Código</button>
-        <button type="button" role="tab" aria-selected={tab === "ai"} onClick={() => setTab("ai")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "ai" ? "bg-white shadow-sm" : "text-mute"}`}>Pedir para uma IA</button>
+        <button type="button" role="tab" aria-selected={tab === "code"} onClick={() => setTab("code")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "code" ? "bg-card shadow-sm" : "text-mute"}`}>Código</button>
+        <button type="button" role="tab" aria-selected={tab === "ai"} onClick={() => setTab("ai")} className={`flex-1 rounded-md py-2 font-semibold ${tab === "ai" ? "bg-card shadow-sm" : "text-mute"}`}>Pedir para uma IA</button>
       </div>
       {tab === "code" ? (
         <>

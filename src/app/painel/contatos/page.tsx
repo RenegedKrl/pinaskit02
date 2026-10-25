@@ -1,37 +1,43 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
-import { getSession } from "@/lib/session";
+import { canEdit, getSession } from "@/lib/session";
 import { STATUS, statusLabel, TEMP } from "@/lib/copy";
 import { dateTime, formatPhone } from "@/lib/utils";
 import { Badge, Card, Empty, Input, PageHeader, Select } from "@/components/ui";
+import { StatusSelect } from "@/components/contatos/status-select";
 import { applyFilters, type LeadFilters } from "./filters";
 
 const PAGE = 25;
 
-export default async function Contatos({ searchParams }: { searchParams: Promise<LeadFilters> }) {
+export default async function Contatos({ searchParams }: { searchParams: Promise<LeadFilters & { ok?: string }> }) {
   const f = await searchParams;
-  const { supabase, workspace } = await getSession();
+  const { supabase, workspace, role } = await getSession();
   const page = Math.max(1, Number(f.pag) || 1);
   const { q, days } = applyFilters(
     supabase.from("leads").select("id, name, phone_e164, email, source_label, status, temperature, score, created_at, widgets(name)", { count: "exact" })
       .eq("workspace_id", workspace.id), f);
   const { data: leads, count } = await q.order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1);
   const { data: srcRows } = await supabase.from("leads").select("source_label").eq("workspace_id", workspace.id).limit(1000);
+  const { data: points } = await supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name");
   const sources = [...new Set((srcRows ?? []).map((r) => r.source_label).filter(Boolean))] as string[];
-  const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag") as [string, string][]).toString();
+  const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag" && k !== "ok") as [string, string][]).toString();
   const total = count ?? 0;
+  const back = `/painel/contatos${qs || page > 1 ? `?${[qs, page > 1 ? `pag=${page}` : ""].filter(Boolean).join("&")}` : ""}`;
+  const edit = canEdit(role);
 
   return (
     <>
       <PageHeader title="Contatos" desc="Pessoas que deixaram o contato pelo seu site (leads)." action={
-        <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
+        <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
       } />
-      <form className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+      {f.ok && <p role="status" className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-800">{f.ok}</p>}
+      <form className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
         <Input name="q" defaultValue={f.q} placeholder="Buscar nome, telefone ou e-mail" className="lg:col-span-2" />
         <Select name="p" defaultValue={String(days)} aria-label="Período">
           <option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Último ano</option>
         </Select>
         <Select name="origem" defaultValue={f.origem ?? ""} aria-label="Origem"><option value="">Todas as origens</option>{sources.map((s) => <option key={s}>{s}</option>)}</Select>
+        {!!points?.length && <Select name="ponto" defaultValue={f.ponto ?? ""} aria-label="Ponto de contato"><option value="">Todos os pontos de contato</option>{points!.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>}
         <Select name="temp" defaultValue={f.temp ?? ""} aria-label="Temperatura"><option value="">Toda temperatura</option>{Object.entries(TEMP).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}</Select>
         <div className="flex gap-2">
           <Select name="status" defaultValue={f.status ?? ""} aria-label="Etapa"><option value="">Todas as etapas</option>{STATUS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</Select>
@@ -55,7 +61,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
                     <td className="px-4 py-3"><a className="text-emerald-700 hover:underline" target="_blank" rel="noopener" href={`https://wa.me/${l.phone_e164}`}>{formatPhone(l.phone_e164)}</a></td>
                     <td className="px-4 py-3">{l.source_label || "Acesso direto"}</td>
                     <td className="px-4 py-3"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label} · {l.score}</Badge></td>
-                    <td className="px-4 py-3">{statusLabel(l.status)}</td>
+                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} back={back} disabled={!edit} /></td>
                     <td className="px-4 py-3 text-mute">{dateTime(l.created_at)}</td>
                   </tr>
                 ))}
@@ -64,7 +70,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
           </Card>
           <div className="space-y-2 md:hidden">
             {leads.map((l) => (
-              <Link key={l.id} href={`/painel/contatos/${l.id}`} className="block rounded-2xl border border-line bg-white p-4">
+              <Link key={l.id} href={`/painel/contatos/${l.id}`} className="block rounded-2xl border border-line bg-card p-4">
                 <div className="flex justify-between"><span className="font-semibold">{l.name || "Sem nome"}</span><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label}</Badge></div>
                 <p className="text-sm text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.created_at)}</p>
                 <p className="text-sm">{statusLabel(l.status)}</p>
@@ -74,8 +80,8 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
           <div className="mt-4 flex items-center justify-between text-sm text-mute">
             <span>Mostrando {(page - 1) * PAGE + 1}–{Math.min(page * PAGE, total)} de {total}</span>
             <div className="flex gap-2">
-              {page > 1 && <Link className="rounded-lg border border-line bg-white px-3 py-1.5" href={`?${qs}&pag=${page - 1}`}>Anterior</Link>}
-              {page * PAGE < total && <Link className="rounded-lg border border-line bg-white px-3 py-1.5" href={`?${qs}&pag=${page + 1}`}>Próxima</Link>}
+              {page > 1 && <Link className="rounded-lg border border-line bg-card px-3 py-1.5" href={`?${qs}&pag=${page - 1}`}>Anterior</Link>}
+              {page * PAGE < total && <Link className="rounded-lg border border-line bg-card px-3 py-1.5" href={`?${qs}&pag=${page + 1}`}>Próxima</Link>}
             </div>
           </div>
         </>

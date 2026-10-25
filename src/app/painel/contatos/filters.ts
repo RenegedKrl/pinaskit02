@@ -1,6 +1,6 @@
 import { since } from "@/lib/utils";
 
-export interface LeadFilters { p?: string; q?: string; origem?: string; temp?: string; status?: string; pag?: string }
+export interface LeadFilters { p?: string; q?: string; origem?: string; temp?: string; status?: string; ponto?: string; pag?: string }
 
 // Genérico: devolve o mesmo tipo de consulta recebido, mantendo o tipo das linhas.
 export function applyFilters<Q>(query: Q, f: LeadFilters): { q: Q; days: number } {
@@ -10,6 +10,7 @@ export function applyFilters<Q>(query: Q, f: LeadFilters): { q: Q; days: number 
   if (f.origem) q = q.eq("source_label", f.origem);
   if (f.temp) q = q.eq("temperature", f.temp);
   if (f.status) q = q.eq("status", f.status);
+  if (f.ponto && /^[0-9a-f-]{36}$/i.test(f.ponto)) q = q.eq("widget_id", f.ponto);
   if (f.q) {
     const s = f.q.replace(/[%,()]/g, "").slice(0, 60);
     const digits = s.replace(/\D/g, "");

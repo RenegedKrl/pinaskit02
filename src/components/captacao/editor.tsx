@@ -173,7 +173,7 @@ export function Editor(p: EditorProps) {
           {hasForm && <Field label="Formulário"><RulesEditor value={c.formRules} onChange={(r) => set("formRules", r)} /></Field>}
         </Section>
 
-        <details className="rounded-2xl border border-line bg-white p-5">
+        <details className="rounded-2xl border border-line bg-card p-5">
           <summary className="cursor-pointer font-display font-semibold">Opções avançadas</summary>
           <div className="mt-4 space-y-4">
             {hasButton && <Field label="Mensagem do link direto" hint="Usada quando a pessoa abre o WhatsApp sem preencher formulário."><Input value={c.prefill} onChange={(e) => set("prefill", e.target.value)} /></Field>}
@@ -199,7 +199,7 @@ export function Editor(p: EditorProps) {
           </div>
         </details>
 
-        <div className="sticky bottom-20 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-white/95 p-3 backdrop-blur md:bottom-4">
+        <div className="sticky bottom-20 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-card/95 p-3 backdrop-blur md:bottom-4">
           <Button onClick={save} disabled={pending}>{pending ? "Salvando…" : p.id ? "Salvar alterações" : "Criar e instalar"}</Button>
           {msg && <p role="status" className={cn("text-sm", msg.ok ? "text-emerald-700" : "text-red-700")}>{msg.text}</p>}
         </div>

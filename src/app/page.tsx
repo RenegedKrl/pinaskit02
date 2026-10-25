@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { BarChart3, Check, FormInput, MessageCircle, MousePointerClick, Route, Users } from "lucide-react";
 import { brl, PLAN } from "@/lib/plan";
@@ -25,11 +26,12 @@ const faq = [
 
 export default function Home() {
   return (
-    <div className="bg-white">
+    <div className="bg-card">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
         <Link href="/" className="font-display text-xl font-bold text-primary">Pinas Kit</Link>
         <nav className="flex items-center gap-2 text-[15px]">
           <a href="#preco" className="hidden px-3 py-2 text-mute sm:block">Preço</a>
+          <ThemeToggle compact />
           <Link href="/entrar" className="px-3 py-2">Entrar</Link>
           <Link href="/criar-conta" className="rounded-lg bg-primary px-4 py-2 font-semibold text-white">Testar grátis</Link>
         </nav>
@@ -50,7 +52,7 @@ export default function Home() {
           <h2 className="text-center font-display text-3xl font-bold">Como funciona</h2>
           <ol className="mt-10 grid gap-6 md:grid-cols-3">
             {steps.map((s, i) => (
-              <li key={s.t} className="rounded-2xl bg-white p-6">
+              <li key={s.t} className="rounded-2xl bg-card p-6">
                 <span className="grid size-10 place-items-center rounded-full bg-primary font-display font-bold text-white">{i + 1}</span>
                 <h3 className="mt-4 font-display text-lg font-semibold">{s.t}</h3>
                 <p className="mt-1 text-mute">{s.d}</p>
@@ -76,7 +78,7 @@ export default function Home() {
       <section id="preco" className="bg-bg py-16">
         <div className="mx-auto max-w-md px-4">
           <h2 className="text-center font-display text-3xl font-bold">Um preço, tudo liberado</h2>
-          <div className="mt-8 rounded-2xl border-2 border-primary bg-white p-8">
+          <div className="mt-8 rounded-2xl border-2 border-primary bg-card p-8">
             <p className="font-display text-lg font-semibold">Plano {PLAN.name}</p>
             <p className="mt-2 font-display text-4xl font-bold">{brl(PLAN.monthly)}<span className="text-base font-normal text-mute">/mês</span></p>
             <p className="text-mute">ou {brl(PLAN.yearly)}/ano ({brl(PLAN.yearlyPerMonth)}/mês)</p>

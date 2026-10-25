@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Home, MousePointerClick, Users, KanbanSquare, Settings, CreditCard, LogOut, ChevronsLeft, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/painel", label: "Início", icon: Home },
@@ -22,7 +23,7 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
 
   return (
     <>
-      <aside className={cn("sticky top-0 hidden h-dvh flex-col border-r border-line bg-white p-3 md:flex", small ? "w-[68px]" : "w-60")}>
+      <aside className={cn("sticky top-0 hidden h-dvh flex-col border-r border-line bg-card p-3 md:flex", small ? "w-[68px]" : "w-60")}>
         <div className="mb-6 flex items-center justify-between px-2 pt-2">
           {!small && <span className="font-display text-lg font-bold text-primary">Pinas Kit</span>}
           <button onClick={toggle} aria-label={small ? "Abrir menu" : "Recolher menu"} className="rounded-md p-1.5 text-mute hover:bg-primary-soft">
@@ -45,10 +46,11 @@ export function Sidebar({ trialText, signOut }: { trialText: string | null; sign
             </div>
           )}
           <Link href="/painel/assinatura" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-ink hover:bg-bg"><CreditCard size={18} />{!small && "Assinatura"}</Link>
+          <ThemeToggle compact={small} className="w-full" />
           <form action={signOut}><button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-ink hover:bg-bg"><LogOut size={18} />{!small && "Sair"}</button></form>
         </div>
       </aside>
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
         {[NAV[0], NAV[2], NAV[3], NAV[4]].map(({ href, label, icon: I }) => (
           <Link key={href} href={href} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs", active(href) ? "text-primary" : "text-mute")}>
             <I size={20} />{href === "/painel/configuracoes" ? "Mais" : label}

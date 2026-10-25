@@ -9,9 +9,9 @@ export function Button({ variant = "primary", size = "md", className, ...p }: Bt
         "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         size === "md" ? "h-11 px-5 text-[15px]" : "h-9 px-3 text-sm",
         variant === "primary" && "bg-primary text-white hover:bg-primary-hover",
-        variant === "outline" && "border border-line bg-white text-ink hover:bg-primary-soft",
+        variant === "outline" && "border border-line bg-card text-ink hover:bg-primary-soft",
         variant === "ghost" && "text-ink hover:bg-primary-soft",
-        variant === "danger" && "bg-red-600 text-white hover:bg-red-700",
+        variant === "danger" && "bg-red-600 text-white hover:brightness-110",
         variant === "whatsapp" && "bg-success text-white hover:brightness-95",
         className,
       )}
@@ -20,7 +20,7 @@ export function Button({ variant = "primary", size = "md", className, ...p }: Bt
   );
 }
 
-export const inputCls = "w-full rounded-lg border border-line bg-white px-3 py-2.5 text-[15px] text-ink outline-none focus:border-primary focus:ring-3 focus:ring-primary/20";
+export const inputCls = "w-full rounded-lg border border-line bg-card px-3 py-2.5 text-[15px] text-ink outline-none focus:border-primary focus:ring-3 focus:ring-primary/20";
 export const Input = ({ className, ...p }: InputHTMLAttributes<HTMLInputElement>) => <input className={cn(inputCls, className)} {...p} />;
 export const Textarea = ({ className, ...p }: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea className={cn(inputCls, className)} {...p} />;
 export const Select = ({ className, ...p }: SelectHTMLAttributes<HTMLSelectElement>) => <select className={cn(inputCls, "pr-8", className)} {...p} />;
@@ -36,7 +36,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cn("rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(24,21,44,0.04)]", className)}>{children}</section>;
+  return <section className={cn("rounded-2xl border border-line bg-card p-5 shadow-[0_1px_2px_rgba(24,21,44,0.04)]", className)}>{children}</section>;
 }
 
 export function Badge({ className, children }: { className?: string; children: ReactNode }) {

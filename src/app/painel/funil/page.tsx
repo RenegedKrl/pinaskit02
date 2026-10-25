@@ -23,14 +23,14 @@ export default async function Funil({ searchParams }: { searchParams: Promise<{ 
           const items = leads.filter((l) => l.status === s.id);
           const sum = items.reduce((a, l) => a + Number(l.deal_value || 0), 0);
           return (
-            <section key={s.id} className="rounded-2xl bg-white/60 p-3" aria-label={s.label}>
+            <section key={s.id} className="rounded-2xl bg-card/60 p-3" aria-label={s.label}>
               <header className="mb-3">
                 <h2 className="font-display font-semibold">{s.label} <span className="text-mute">({items.length})</span></h2>
                 <p className="text-xs text-mute">{sum ? brl(sum) : s.hint}</p>
               </header>
               <div className="space-y-2">
                 {items.slice(0, 50).map((l) => (
-                  <div key={l.id} className="rounded-xl border border-line bg-white p-3">
+                  <div key={l.id} className="rounded-xl border border-line bg-card p-3">
                     <Link href={`/painel/contatos/${l.id}`} className="font-semibold hover:text-primary">{l.name || "Sem nome"}</Link>
                     <p className="text-xs text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.updated_at)}</p>
                     <div className="mt-1"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label}</Badge></div>

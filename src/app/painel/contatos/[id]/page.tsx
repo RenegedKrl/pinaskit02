@@ -5,6 +5,7 @@ import { canEdit, getSession, isAdmin } from "@/lib/session";
 import { METHOD_LABEL, STATUS, statusLabel, TEMP } from "@/lib/copy";
 import { dateTime, formatPhone } from "@/lib/utils";
 import { Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
+import { Journey, type PageView } from "@/components/contatos/journey";
 import { addNote, deleteLead, setStatus, updateLead } from "../actions";
 
 type Touch = { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string; referrer?: string; landing?: string; click_ids?: Record<string, string> } | null;
@@ -33,6 +34,10 @@ export default async function Contato({ params }: { params: Promise<{ id: string
   const { data: l } = await supabase.from("leads").select("*, widgets(name)").eq("id", id).eq("workspace_id", workspace.id).maybeSingle();
   if (!l) notFound();
   const { data: acts } = await supabase.from("lead_activities").select("id, type, body, created_at").eq("lead_id", id).order("created_at", { ascending: false }).limit(50);
+  const { data: views } = l.visitor_id
+    ? await supabase.from("events").select("page_url, source_label, created_at").eq("workspace_id", workspace.id)
+        .eq("visitor_id", l.visitor_id).eq("type", "pageview").order("created_at").limit(200)
+    : { data: [] as PageView[] };
   const edit = canEdit(role);
   const t = TEMP[l.temperature as keyof typeof TEMP];
   const firstName = (l.name || "").split(" ")[0];
@@ -58,7 +63,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
               <input type="hidden" name="id" value={l.id} />
               {STATUS.map((s) => (
                 <button key={s.id} name="status" value={s.id} disabled={!edit} title={s.hint}
-                  className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${l.status === s.id ? "border-primary bg-primary text-white" : "border-line bg-white hover:border-primary"}`}>{s.label}</button>
+                  className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${l.status === s.id ? "border-primary bg-primary text-white" : "border-line bg-card hover:border-primary"}`}>{s.label}</button>
               ))}
             </form>
           </Card>
@@ -71,6 +76,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
             </div>
             {!l.first_touch && !l.last_touch && <p className="text-sm text-mute">Não foi possível identificar a origem (acesso direto ou link sem parâmetros).</p>}
           </Card>
+          <Journey views={(views ?? []) as PageView[]} hasVisitor={!!l.visitor_id} contactAt={l.created_at} />
           {(l.answers?.option || l.answers?.message) && (
             <Card>
               <h2 className="mb-2 font-display font-semibold">Respostas do formulário</h2>

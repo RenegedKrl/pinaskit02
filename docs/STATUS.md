@@ -18,6 +18,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 5. E-mails: código pronto 24/10 (`_shared/email.ts`, aviso de novo contato no w-lead, função `trial-reminder` + migração 0003, testes). Chave Resend já no Supabase. Falta: testar chegada do e-mail (adiado; Resend de teste só envia p/ kaue.kfd@gmail.com), domínio verificado . Cron ok (0004): expire-plans 1x/h e trial-reminder 9h, segredos no Vault (cron_secret, project_url); chamada manual → 200. Auth do Supabase: limite de ~2 e-mails/h no SMTP padrão → configurar SMTP do Resend (Auth → SMTP) junto com o domínio
 6. ~~Vercel~~ no ar 24/10: https://pinaskit.vercel.app (GitHub RenegedKrl/pinas_kit, main). APP_URL/APP_ORIGIN_HOST das funções apontam para lá. URLs do Auth ok. Login Google ok e publicado (Em produção, sem logo/verificação de marca). Widget publicado testado 25/10: pinaskit.vercel.app/w.js → lead "Instagram"/teste-producao no banco. Falta: domínio próprio, Asaas de produção. Código de instalação nunca usa localhost (fallback https://pinaskit.vercel.app). Ícone do botão = logo oficial do WhatsApp (w.js 7,0 KB). "Instalado" agora também é marcado pelo w-config (eventos via sendBeacon são barrados pelo Brave/bloqueadores); tests/install.test.ts
 
+7. ~~Contatos + tema~~ 25/10: filtro por ponto de contato, etapa editável na lista, jornada do visitante na ficha (`components/contatos/`), tema claro/escuro (token `card`, `.dark` em globals.css, botão no menu e na landing)
+
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.

@@ -13,7 +13,7 @@ export default async function Captacao() {
   return (
     <>
       <PageHeader title="Botões e formulários" desc="Os lugares do seu site onde as pessoas falam com você." action={
-        <div className="flex gap-2"><Link href="/painel/captacao/links" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-4 font-semibold"><Link2 size={18} />Criar link com origem</Link>{add}</div>
+        <div className="flex gap-2"><Link href="/painel/captacao/links" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Link2 size={18} />Criar link com origem</Link>{add}</div>
       } />
       {!widgets?.length ? (
         <Empty title="Você ainda não criou nenhum botão ou formulário" desc="Crie o primeiro em 2 minutos: escolha o modo, o número de WhatsApp e cole uma linha no seu site." action={add} />

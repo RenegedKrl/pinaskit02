@@ -50,7 +50,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         title={`Olá${name ? `, ${name}` : ""}!`}
         desc="Veja como estão chegando os contatos do seu negócio."
         action={
-          <div className="flex gap-1 rounded-lg border border-line bg-white p-1 text-sm" role="group" aria-label="Período">
+          <div className="flex gap-1 rounded-lg border border-line bg-card p-1 text-sm" role="group" aria-label="Período">
             {[7, 30, 90].map((d) => (
               <Link key={d} href={`/painel?p=${d}`} className={`rounded-md px-3 py-1.5 ${d === days ? "bg-primary text-white" : "text-mute"}`}>{d} dias</Link>
             ))}
