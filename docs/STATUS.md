@@ -16,7 +16,7 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 3. ~~Ponta a ponta~~ ok 24/10: conta → botão+formulário → `public/teste/` (utm google/cpc) → lead em Contatos como "Google Ads". Contato de teste no banco: apagar depois
 4. ~~Asaas sandbox~~ ok 24/10: assinar → PAYMENT_RECEIVED → active; cancelar → SUBSCRIPTION_DELETED → canceled. Webhook precisa do evento PAYMENT_RECEIVED (PIX/boleto). No .env.local a chave Asaas vai escapada como `\$aact...`. Revisar: cancelada sem current_period_end
 5. E-mails: código pronto 24/10 (`_shared/email.ts`, aviso de novo contato no w-lead, função `trial-reminder` + migração 0003, testes). Chave Resend já no Supabase. Falta: testar chegada do e-mail (adiado; Resend de teste só envia p/ kaue.kfd@gmail.com), domínio verificado . Cron ok (0004): expire-plans 1x/h e trial-reminder 9h, segredos no Vault (cron_secret, project_url); chamada manual → 200. Auth do Supabase: limite de ~2 e-mails/h no SMTP padrão → configurar SMTP do Resend (Auth → SMTP) junto com o domínio
-6. ~~Vercel~~ no ar 24/10: https://pinaskit.vercel.app (GitHub RenegedKrl/pinas_kit, main). APP_URL/APP_ORIGIN_HOST das funções apontam para lá. Falta: URLs no Supabase Auth, domínio próprio, Asaas de produção
+6. ~~Vercel~~ no ar 24/10: https://pinaskit.vercel.app (GitHub RenegedKrl/pinas_kit, main). APP_URL/APP_ORIGIN_HOST das funções apontam para lá. URLs do Auth ok. Login Google ok e publicado (Em produção, sem logo/verificação de marca). Falta: domínio próprio, Asaas de produção
 
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.
