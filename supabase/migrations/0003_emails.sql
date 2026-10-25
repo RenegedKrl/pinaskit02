@@ -1,13 +1,6 @@
 -- Aviso de fim do teste: marca quando o e-mail foi enviado (1 vez por conta).
 alter table workspaces add column if not exists trial_reminder_sent_at timestamptz;
 
--- Agendamento (rodar no SQL Editor, com pg_cron e pg_net ativos, trocando o segredo):
--- select cron.schedule('trial-reminder', '0 12 * * *', $$
---   select net.http_post(
---     url := 'https://PROJETO.supabase.co/functions/v1/trial-reminder',
---     headers := jsonb_build_object('content-type','application/json','x-cron-secret','CRON_SECRET_AQUI'),
---     body := '{}'::jsonb)
--- $$);
 
 -- O navegador também não pode mexer na marca do aviso (evita reenvio forçado).
 create or replace function protect_billing() returns trigger language plpgsql as $$
