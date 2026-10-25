@@ -23,4 +23,4 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.
 
 ## Pendências do dono
-- Conta Asaas com CNPJ · domínio do Pinas Kit · apagar teste no CentralKit · mover MOVER-PARA-.claude-settings.json para .claude/settings.json
+- Asaas PRODUÇÃO ligado 24/10 (conta pessoa física): chave no .env.local e no Supabase; falta Vercel (ASAAS_API_KEY/ASAAS_BASE_URL), webhook na conta de produção e desligar o do sandbox. Contas criadas no sandbox (poguerio9) têm IDs que não existem em produção · domínio do Pinas Kit · apagar teste no CentralKit · mover MOVER-PARA-.claude-settings.json para .claude/settings.json
