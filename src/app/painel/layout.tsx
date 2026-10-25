@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Sidebar } from "@/components/painel/sidebar";
+import { Tour } from "@/components/painel/tour";
+import { Welcome } from "@/components/painel/welcome";
 import { getSession, trialDaysLeft } from "@/lib/session";
 import { signOut } from "@/app/entrar/actions";
 
@@ -23,6 +25,8 @@ export default async function PainelLayout({ children }: { children: React.React
           </div>
         )}
         <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <Tour />
+        <Welcome workspaceId={w.id} active={w.plan_status === "active"} />
       </div>
     </div>
   );

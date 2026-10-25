@@ -32,7 +32,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
         <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
       } />
       {f.ok && <p role="status" className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-800">{f.ok}</p>}
-      <form className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
+      <form data-tour="filtros" className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
         <Input name="q" defaultValue={f.q} placeholder="Buscar nome, telefone ou e-mail" className="lg:col-span-2" />
         <Select name="p" defaultValue={String(days)} aria-label="Período">
           <option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Último ano</option>

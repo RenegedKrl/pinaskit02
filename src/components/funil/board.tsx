@@ -68,7 +68,7 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
       </div>
       <p role="status" aria-live="polite" className="mb-2 min-h-5 text-sm text-mute">{msg}</p>
 
-      <div className="-mx-4 overflow-x-auto px-4 pb-3 md:-mx-0 md:px-0">
+      <div data-tour="quadro" className="-mx-4 overflow-x-auto px-4 pb-3 md:-mx-0 md:px-0">
         <div className="flex gap-3">
           {stages.map((s) => {
             const items = filtered.filter((l) => l.status === s.key);

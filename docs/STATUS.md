@@ -24,7 +24,7 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 8. ~~Checklist seção 11~~ 25/10: telas de carregamento (painel/loading), erro (painel/error, app/error) e não encontrado (not-found). Etapa agora muda na hora (componentes cliente + router.refresh). Falta: adaptar tests/rls.sql a banco com dados, WordPress/Wix, anual/cartão, simular fim do teste
 
-9. ~~Funil editável + design + tutorial~~ 25/10: etapas por conta (0005_stages, máx 10, novo/ganho/perdido fixas, delete_stage move contatos), funil com arrastar, busca e filtros (components/funil), design azul profissional (Inter), tutorial de 8 passos no Início. tests/rls.sql agora roda em banco com dados: RLS OK
+9. ~~Funil editável + design + tutorial~~ 25/10: etapas por conta (0005_stages, máx 10, novo/ganho/perdido fixas, delete_stage move contatos), funil com arrastar, busca e filtros (components/funil), design azul profissional (Inter), tour guiado de 12 passos (escurece a tela, destaca o ponto, balão com seta, segue as páginas; 1ª visita ou botão Tutorial) e boas-vindas única ao ativar a assinatura. tests/rls.sql agora roda em banco com dados: RLS OK
 
 ## Decisões
 - Um plano: R$ 49,90/mês ou R$ 499/ano, 7 dias grátis sem cartão. Asaas apenas.

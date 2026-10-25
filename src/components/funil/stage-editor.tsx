@@ -36,7 +36,7 @@ export function StageEditor({ stages }: { stages: Stage[] }) {
 
   return (
     <>
-      <Button variant="outline" onClick={() => ref.current?.showModal()}><Pencil size={16} />Editar etapas</Button>
+      <Button variant="outline" data-tour="editar-etapas" onClick={() => ref.current?.showModal()}><Pencil size={16} />Editar etapas</Button>
       <dialog ref={ref} className="m-auto w-[min(560px,calc(100vw-32px))] rounded-xl border border-line bg-card p-0 text-ink backdrop:bg-black/40">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div>

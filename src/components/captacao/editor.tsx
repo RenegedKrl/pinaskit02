@@ -82,7 +82,7 @@ export function Editor(p: EditorProps) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="space-y-4">
+      <div className="space-y-4" data-tour="editor">
         <Section n={1} title="Como você quer receber contatos?">
           <div className="grid gap-3 sm:grid-cols-3">
             {(Object.keys(MODES) as Mode[]).map((m) => (
