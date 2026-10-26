@@ -71,7 +71,7 @@ export default async function Contato({ params }: { params: Promise<{ id: string
         <div className="space-y-4 lg:col-span-2">
           <Card>
             <h2 className="font-display font-semibold">Etapa do atendimento</h2>
-            <StatusButtons id={l.id} status={l.status} stages={stages} disabled={!edit} />
+            <StatusButtons id={l.id} status={l.status} stages={stages} name={l.name || "Contato"} disabled={!edit} />
           </Card>
           <Card>
             <h2 className="mb-3 font-display font-semibold">De onde veio</h2>

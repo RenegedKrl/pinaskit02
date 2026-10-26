@@ -118,7 +118,7 @@ export function Board({ stages, leads, points, edit }: { stages: Stage[]; leads:
                           {t && <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${t.cls}`}>{t.label} · {l.score}</span>}
                           {l.deal_value ? <span className="text-xs font-semibold tabular-nums">{brl(Number(l.deal_value))}</span> : null}
                         </div>
-                        {edit && <div className="mt-2 md:hidden"><StatusSelect id={l.id} status={l.status} stages={stages} className="w-full" /></div>}
+                        {edit && <div className="mt-2 md:hidden"><StatusSelect id={l.id} status={l.status} stages={stages} name={l.name || "Contato"} className="w-full" /></div>}
                       </article>
                     );
                   })}

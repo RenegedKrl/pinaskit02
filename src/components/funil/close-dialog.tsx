@@ -4,6 +4,30 @@ import { LOST_REASONS } from "@/lib/copy";
 import { Button } from "@/components/ui";
 
 export type CloseInfo = { deal_value?: string; lost_reason?: string };
+type Kind = "new" | "open" | "won" | "lost";
+
+/** Dados do envio de troca de etapa, com valor/motivo quando houver. */
+export function stageForm(id: string, status: string, info: CloseInfo = {}): FormData {
+  const fd = new FormData(); fd.set("id", id); fd.set("status", status);
+  if (info.deal_value !== undefined) fd.set("deal_value", info.deal_value);
+  if (info.lost_reason !== undefined) fd.set("lost_reason", info.lost_reason);
+  return fd;
+}
+
+/**
+ * Troca de etapa com pergunta: indo para venda ou perda, abre a janela antes de salvar.
+ * ask(next, save, cancel) → chama save(info) direto nas outras etapas.
+ */
+export function useCloseAsk(name: string, stages: { key: string; kind?: Kind }[]) {
+  const [open, setOpen] = useState<{ kind: "won" | "lost"; save: (i: CloseInfo) => void; cancel: () => void } | null>(null);
+  const ask = (next: string, save: (i: CloseInfo) => void, cancel: () => void) => {
+    const kind = stages.find((s) => s.key === next)?.kind;
+    if (kind === "won" || kind === "lost") setOpen({ kind, save, cancel }); else save({});
+  };
+  const dialog = open && <CloseDialog kind={open.kind} name={name}
+    onDone={(i) => { const o = open; setOpen(null); o.save(i); }} onCancel={() => { const o = open; setOpen(null); o.cancel(); }} />;
+  return { ask, dialog };
+}
 
 /** Pergunta o valor (venda) ou o motivo (perda) ao fechar um contato. Tudo é opcional. */
 export function CloseDialog({ kind, name, onDone, onCancel }: { kind: "won" | "lost"; name: string; onDone: (i: CloseInfo) => void; onCancel: () => void }) {

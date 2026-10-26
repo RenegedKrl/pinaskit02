@@ -15,15 +15,18 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
   const { supabase, workspace, role, user } = await getSession();
   const page = Math.max(1, Number(f.pag) || 1);
   const { q, days } = applyFilters(
-    supabase.from("leads").select("id, name, phone_e164, email, source_label, status, temperature, score, created_at, tags, next_followup_at, widgets(name)", { count: "exact" })
+    supabase.from("leads").select("id, name, phone_e164, email, source_label, status, temperature, score, created_at, tags, next_followup_at, lost_reason, owner_id, widgets(name)", { count: "exact" })
       .eq("workspace_id", workspace.id), { ...f, me: user.id });
-  const [{ data: leads, count }, { data: srcRows }, stages, { data: points }] = await Promise.all([
+  const [{ data: leads, count }, { data: srcRows }, stages, { data: points }, { data: members }] = await Promise.all([
     q.order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1),
-    supabase.from("leads").select("source_label, tags").eq("workspace_id", workspace.id).limit(1000),
+    supabase.from("leads").select("source_label, tags, lost_reason").eq("workspace_id", workspace.id).limit(1000),
     getStages(supabase, workspace.id),
     supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name"),
+    supabase.from("workspace_members").select("user_id, email").eq("workspace_id", workspace.id),
   ]);
   const allTags = [...new Set((srcRows ?? []).flatMap((r) => r.tags ?? []))].sort() as string[];
+  const reasons = [...new Map((srcRows ?? []).filter((r) => r.lost_reason).map((r) => [r.lost_reason!.toLowerCase(), r.lost_reason!])).values()].sort();
+  const who = (id: string | null) => (id ? members?.find((m) => m.user_id === id)?.email?.split("@")[0] ?? "Alguém da equipe" : null);
   const sources = [...new Set((srcRows ?? []).map((r) => r.source_label).filter(Boolean))] as string[];
   const qs = new URLSearchParams(Object.entries(f).filter(([k, v]) => v && k !== "pag" && k !== "ok") as [string, string][]).toString();
   const total = count ?? 0;
@@ -45,7 +48,8 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
         </Select>
         <Select name="origem" defaultValue={f.origem ?? ""} aria-label="Origem"><option value="">Todas as origens</option>{sources.map((s) => <option key={s}>{s}</option>)}</Select>
         {!!points?.length && <Select name="ponto" defaultValue={f.ponto ?? ""} aria-label="Ponto de contato"><option value="">Todos os pontos de contato</option>{points!.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>}
-        <Select name="resp" defaultValue={f.resp ?? ""} aria-label="Responsável"><option value="">Todos os responsáveis</option><option value="eu">Meus contatos</option><option value="ninguem">Sem responsável</option></Select>
+        <Select name="resp" defaultValue={f.resp ?? ""} aria-label="Responsável"><option value="">Todos os responsáveis</option><option value="eu">Meus contatos</option><option value="ninguem">Sem responsável</option>{(members ?? []).filter((m) => m.user_id !== user.id).map((m) => <option key={m.user_id} value={m.user_id}>{m.email}</option>)}</Select>
+        {reasons.length > 0 && <Select name="motivo" defaultValue={f.motivo ?? ""} aria-label="Motivo da perda"><option value="">Todo motivo de perda</option>{reasons.map((r) => <option key={r} value={r}>{r}</option>)}<option value="sem">Sem motivo informado</option></Select>}
         {allTags.length > 0 && <Select name="tag" defaultValue={f.tag ?? ""} aria-label="Etiqueta"><option value="">Todas as etiquetas</option>{allTags.map((t) => <option key={t} value={t}>{t}</option>)}</Select>}
         <Select name="temp" defaultValue={f.temp ?? ""} aria-label="Temperatura"><option value="">Toda temperatura</option>{Object.entries(TEMP).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}</Select>
         <div className="flex gap-2">
@@ -62,7 +66,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
         <>
           <Card className="hidden overflow-x-auto p-0 md:block">
             <table className="w-full text-left text-[15px]">
-              <thead className="border-b border-line text-sm text-mute"><tr>{["Nome", "WhatsApp", "Origem", "Temperatura", "Etapa", "Chegou em"].map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}</tr></thead>
+              <thead className="border-b border-line text-sm text-mute"><tr>{["Nome", "WhatsApp", "Origem", "Temperatura", "Etapa", "Responsável", "Chegou em"].map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}</tr></thead>
               <tbody>
                 {leads.map((l) => (
                   <tr key={l.id} className="border-b border-line last:border-0 hover:bg-bg">
@@ -70,7 +74,9 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
                     <td className="px-4 py-3"><a className="text-emerald-700 hover:underline" target="_blank" rel="noopener" href={`https://wa.me/${l.phone_e164}`}>{formatPhone(l.phone_e164)}</a></td>
                     <td className="px-4 py-3">{l.source_label || "Acesso direto"}</td>
                     <td className="px-4 py-3"><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label} · {l.score}</Badge></td>
-                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} stages={stages} disabled={!edit} /></td>
+                    <td className="px-4 py-2"><StatusSelect id={l.id} status={l.status} stages={stages} name={l.name || "Contato"} disabled={!edit} />
+                      {l.lost_reason && stages.find((s) => s.key === l.status)?.kind === "lost" && <p className="mt-1 max-w-48 truncate text-xs text-mute" title={l.lost_reason}>Motivo: {l.lost_reason}</p>}</td>
+                    <td className="px-4 py-3 text-sm">{who(l.owner_id) ?? <span className="text-mute">—</span>}</td>
                     <td className="px-4 py-3 text-mute">{dateTime(l.created_at)}</td>
                   </tr>
                 ))}
@@ -82,7 +88,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
               <Link key={l.id} href={`/painel/contatos/${l.id}`} className="block rounded-2xl border border-line bg-card p-4">
                 <div className="flex justify-between"><span className="font-semibold">{l.name || "Sem nome"}</span><Badge className={TEMP[l.temperature as keyof typeof TEMP]?.cls}>{TEMP[l.temperature as keyof typeof TEMP]?.label}</Badge></div>
                 <p className="text-sm text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.created_at)}</p>
-                <p className="text-sm">{stageName(stages, l.status)}</p>
+                <p className="text-sm">{stageName(stages, l.status)}{l.lost_reason && stages.find((s) => s.key === l.status)?.kind === "lost" ? ` · ${l.lost_reason}` : ""}{who(l.owner_id) ? ` · ${who(l.owner_id)}` : ""}</p>
               </Link>
             ))}
           </div>
