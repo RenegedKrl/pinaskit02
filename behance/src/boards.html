@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Pinas Kit — Behance</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .board { width:1400px; position:relative; overflow:hidden; }
+  .pad { padding:120px 100px; }
+  .eyebrow { font-size:14px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--blue); }
+  .h { font-size:64px; line-height:1.04; letter-spacing:-.035em; font-weight:600; }
+  .h em, .serif { font-family:"Instrument Serif", serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .lead-t { font-size:22px; line-height:1.5; color:#475569; max-width:760px; }
+  .dark { background:var(--navy); color:#e5eaf2; } .dark .lead-t { color:#94a3b8; }
+  .num { font-size:13px; color:#94a3b8; font-weight:600; letter-spacing:.1em; }
+  .fit { position:relative; overflow:hidden; } .fit > .scale { position:absolute; top:0; left:0; }
+  .glow { position:absolute; border-radius:50%; filter:blur(110px); opacity:.55; }
+</style></head>
+<body><div id="root"></div>
+<script src="mocks.js"></script>
+<script type="text/x-tpl" id="tpl">
+
+<!-- 01 CAPA -->
+<section class="board dark" data-name="01-capa" style="height:1180px;background:radial-gradient(80% 60% at 50% 0%,#1e3a8a 0%,#0b1220 62%)">
+  <div style="position:absolute;top:84px;left:0;right:0;text-align:center;font-size:250px;font-weight:700;letter-spacing:-.06em;color:#ffffff10;line-height:1">pinas<span class="serif">kit</span></div>
+  <div style="position:absolute;top:100px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#94a3b8">
+    <span data-logo="light" style="font-size:34px"></span><span>UX/UI · Branding · SaaS · 2026</span></div>
+  <div style="position:absolute;top:300px;left:0;right:0;text-align:center">
+    <p class="eyebrow" style="color:#93c5fd">Estudo de caso</p>
+    <h1 class="h" style="font-size:76px;margin-top:18px;color:#fff">Saiba de onde vêm seus<br>contatos do <em style="color:#4ade80">WhatsApp</em></h1>
+  </div>
+  <div style="position:absolute;left:190px;top:590px;width:1020px" class="laptop"><div class="lid"><div class="fit" data-mock="dashboard" data-w="988"></div></div><div class="base"></div></div>
+  <div style="position:absolute;right:70px;top:700px;transform:rotate(4deg)" data-phone="mDash"></div>
+</section>
+
+<!-- 02 SOBRE -->
+<section class="board" data-name="02-sobre" style="background:#fff">
+  <div class="pad" style="display:grid;grid-template-columns:1.5fr 1fr;gap:100px;padding-bottom:100px">
+    <div><p class="num" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px;margin-bottom:28px">SOBRE</p>
+      <p style="font-size:38px;line-height:1.3;letter-spacing:-.02em">O <b>Pinas Kit</b> é um SaaS brasileiro que coloca um botão e um formulário de WhatsApp no site e mostra, num CRM simples, <span class="serif" style="color:var(--blue)">de qual anúncio</span> veio cada contato.</p></div>
+    <div><p class="num" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px;margin-bottom:28px">PROJETO</p>
+      <ul style="display:grid;gap:14px;font-size:18px">${[["Produto", "Pinas Kit"], ["Tipo", "SaaS · CRM + widget"], ["Escopo", "Pesquisa, UX/UI, marca, front-end"], ["Plataforma", "Web, celular e script do site"], ["Ano", "2026"]].map(([a, b]) => `<li><span style="color:#94a3b8">${a} / </span>${b}</li>`).join("")}</ul></div>
+  </div>
+</section>
+
+<!-- 03 PROBLEMA -->
+<section class="board" data-name="03-problema" style="background:var(--bg)">
+  <div class="pad">
+    <p class="eyebrow">O problema</p>
+    <h2 class="h" style="margin-top:18px;max-width:1050px">A conversa chega no WhatsApp. <span class="serif" style="color:#94a3b8">A origem se perde no caminho.</span></h2>
+    <p class="lead-t" style="margin-top:26px">Pequenos negócios investem em Google, Meta e Instagram, mas quando o cliente clica para conversar, ninguém sabe qual campanha trouxe aquela pessoa — nem se ela virou venda.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:70px">
+      ${[["01", "Anúncio sem resposta", "Sem saber qual campanha vende, o orçamento vai para todas igualmente."], ["02", "Contato esquecido", "Conversas se perdem no celular; ninguém lembra de retornar no dia certo."], ["03", "Ferramentas difíceis", "CRMs grandes exigem treinamento, integrações e um time técnico."]].map(([n, t, d]) => `<div class="card" style="padding:34px;border-radius:28px"><p class="num">${n}</p><h3 style="font-size:26px;margin:40px 0 12px;letter-spacing:-.02em">${t}</h3><p style="color:#64748b;font-size:17px;line-height:1.55">${d}</p></div>`).join("")}
+    </div>
+  </div>
+</section>
+
+<!-- 04 SOLUÇÃO / FLUXO -->
+<section class="board dark" data-name="04-solucao">
+  <div class="glow" style="width:600px;height:600px;background:#2563eb;left:-200px;top:-200px"></div>
+  <div class="pad" style="position:relative">
+    <p class="eyebrow" style="color:#93c5fd">A solução</p>
+    <h2 class="h" style="margin-top:18px;color:#fff">Uma linha no site. <span class="serif" style="color:#60a5fa">Tudo rastreado.</span></h2>
+    <p class="lead-t" style="margin-top:26px">O script desenha o botão e o formulário, guarda a origem (UTM, anúncio, página) e entrega o contato no WhatsApp e no painel ao mesmo tempo.</p>
+    <div style="display:flex;align-items:stretch;gap:0;margin-top:80px">
+      ${[["Anúncio", "Google, Meta ou Instagram com UTM", "#3b82f6"], ["Site", "Botão + formulário antes do rodapé", "#8b5cf6"], ["WhatsApp", "Mensagem pronta com o nome", "#25D366"], ["Painel", "Contato com origem, jornada e funil", "#f59e0b"]].map(([t, d, c], i) => `${i ? `<div style="flex:0 0 60px;display:grid;place-items:center;color:#334155;font-size:28px">→</div>` : ""}<div style="flex:1;border:1px solid #1f2a37;background:#121a24;border-radius:24px;padding:28px"><span style="display:inline-grid;place-items:center;width:44px;height:44px;border-radius:14px;background:${c}22;color:${c};font-weight:700">${i + 1}</span><h3 style="font-size:24px;margin:26px 0 8px;color:#fff">${t}</h3><p style="color:#94a3b8;font-size:16px;line-height:1.5">${d}</p></div>`).join("")}
+    </div>
+    <div style="margin-top:60px;border-radius:20px;background:#05080e;border:1px solid #1f2a37;padding:26px 30px;font-family:ui-monospace,Consolas,monospace;font-size:17px;color:#cbd5e1">
+      <span style="color:#64748b">&lt;!-- cole antes de &lt;/body&gt; --&gt;</span><br><span style="color:#93c5fd">&lt;script</span> async <span style="color:#fca5a5">src</span>=<span style="color:#86efac">"https://pinaskit.vercel.app/w.js"</span> <span style="color:#fca5a5">data-pk</span>=<span style="color:#86efac">"962jf5zcbx"</span><span style="color:#93c5fd">&gt;&lt;/script&gt;</span></div>
+  </div>
+</section>
+
+<!-- 05 NÚMEROS DO PRODUTO -->
+<section class="board" data-name="05-numeros" style="background:#fff">
+  <div class="pad">
+    <p class="eyebrow">Construído para ser leve</p>
+    <h2 class="h" style="margin-top:18px">Decisões que viram <span class="serif" style="color:var(--blue)">velocidade</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:80px;border-top:1px solid #e2e8f0">
+      ${[["~7 KB", "Script do site compactado, abaixo da meta de 12 KB"], ["1 linha", "De código para instalar, sem trocar ao editar"], ["12", "Cenários testados no navegador: WordPress, Elementor e Wix"], ["10", "Etapas personalizáveis no funil de vendas"]].map(([n, d], i) => `<div style="padding:40px 28px 10px ${i ? "28px" : "0"};${i ? "border-left:1px solid #e2e8f0" : ""}"><b style="font-size:72px;letter-spacing:-.05em;font-weight:600">${n}</b><p style="color:#64748b;font-size:17px;line-height:1.5;margin-top:14px;max-width:240px">${d}</p><div style="display:flex;gap:4px;margin-top:30px">${Array.from({ length: 16 }, (_, k) => `<i style="flex:1;height:34px;border-radius:4px;background:${k < [12, 4, 12, 10][i] ? "#2563eb" : "#e2e8f0"}"></i>`).join("")}</div></div>`).join("")}
+    </div>
+  </div>
+</section>
+
+<!-- 06 MARCA -->
+<section class="board" data-name="06-marca" style="background:var(--bg)">
+  <div class="pad">
+    <p class="eyebrow">Marca</p>
+    <h2 class="h" style="margin-top:18px">Um balão no pingo do <span class="serif" style="color:var(--blue)">i</span></h2>
+    <p class="lead-t" style="margin-top:22px">"pinas" em traço firme e o pingo do i como balão de conversa. "kit" em itálico serifado traz o lado humano. O monograma PK ganha uma estrela: a chegada de um novo contato.</p>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-top:64px">
+      <div class="card" style="height:420px;display:grid;place-items:center;border-radius:32px"><span data-logo="dark" style="font-size:150px"></span></div>
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:24px">
+        <div style="border-radius:32px;background:var(--navy);display:grid;place-items:center"><span data-logo="light" style="font-size:80px"></span></div>
+        <div style="border-radius:32px;background:var(--blue);display:flex;align-items:center;justify-content:center;gap:30px"><span data-mark="96"></span><span data-mark="64"></span><span data-mark="40"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 TIPOGRAFIA -->
+<section class="board" data-name="07-tipografia" style="background:#fff">
+  <div class="pad">
+    <div class="row" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px;color:#94a3b8;font-size:14px"><span>Tipografia</span><span style="display:flex;gap:60px"><span>Regular</span><span>Medium</span><span>Semibold</span><span>Bold</span></span></div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:40px"><b style="font-size:210px;font-weight:600;letter-spacing:-.05em;line-height:.9">Inter</b><span class="serif" style="font-size:170px;color:var(--blue);line-height:.9">Instrument</span></div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:60px;margin-top:60px;color:#64748b;font-size:15px">
+      <div><b style="color:#0f172a">Inter · Google Fonts</b><br>Interface, números e textos longos.<br><br><b style="color:#0f172a">Instrument Serif Italic</b><br>Destaques e o "kit" da marca.</div>
+      <div style="font-size:15px;line-height:1.9">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 · R$ 1.234,56 · 12,5%</div>
+    </div>
+    <p style="font-size:34px;line-height:1.45;margin-top:70px;letter-spacing:-.015em;color:#94a3b8"><b style="color:#0f172a;font-weight:500">Textos em português simples, sem jargão.</b> Em vez de "lead qualificado", o painel diz "contato quente". Em vez de "conversion rate", "viraram contato".</p>
+  </div>
+</section>
+
+<!-- 08 CORES -->
+<section class="board" data-name="08-cores" style="background:var(--bg)">
+  <div class="pad">
+    <p class="eyebrow">Cores</p>
+    <h2 class="h" style="margin-top:18px">Azul de confiança, <span class="serif" style="color:#16a34a">verde de conversa</span></h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:300px 200px;gap:20px;margin-top:64px">
+      ${[["Azul Pinas", "#2563EB", "#2563eb", "#fff", "grid-row:span 2"], ["Marinho", "#0B1220", "#0b1220", "#fff", ""], ["WhatsApp", "#25D366", "#25D366", "#fff", ""], ["Estrela", "#FACC15", "#facc15", "#422006", ""], ["Fundo", "#F2F5F9", "#ffffff", "#0f172a", ""]].map(([n, h, c, t, s]) => `<div style="${s};background:${c};color:${t};border-radius:28px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;${c === "#ffffff" ? "border:1px solid #e2e8f0" : ""}"><b style="font-size:22px">${n}</b><span style="font-family:ui-monospace,monospace;font-size:16px;opacity:.85">${h}</span></div>`).join("")}
+    </div>
+    <div style="display:flex;gap:12px;margin-top:20px">${[["Novo", "#0ea5e9"], ["Em atendimento", "#3b82f6"], ["Proposta", "#8b5cf6"], ["Negociação", "#f59e0b"], ["Venda", "#10b981"], ["Não convertido", "#94a3b8"]].map(([n, c]) => `<span style="flex:1;padding:16px;border-radius:16px;background:${c}1f;color:${c};font-weight:700;text-align:center;font-size:15px">${n}</span>`).join("")}</div>
+  </div>
+</section>
+
+<!-- 09 COMPONENTES -->
+<section class="board" data-name="09-componentes" style="background:#fff">
+  <div class="pad">
+    <p class="eyebrow" style="text-align:center">Componentes</p>
+    <h2 class="h" style="margin-top:18px;text-align:center">Peças que se repetem em <span class="serif" style="color:var(--blue)">todo lugar</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:64px" class="app-like">
+      <div style="background:var(--bg);border-radius:28px;padding:30px;display:grid;gap:12px">${[0, 2, 5].map((i) => lead(i)).join("")}</div>
+      <div style="background:var(--bg);border-radius:28px;padding:30px;display:grid;gap:14px;align-content:center;justify-items:center">
+        <span class="btn" style="background:var(--blue);color:#fff;width:100%;text-align:center">Salvar alterações</span><span class="btn ghost" style="width:100%;text-align:center">Editar etapas</span>
+        <span class="wa big" style="width:100%;justify-content:center" data-wa>Abrir WhatsApp</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><span class="chip" style="background:#fef3c7;color:#b45309">Quente</span><span class="chip blue">Morno</span><span class="chip gray">Frio</span><span class="chip violet">orçamento</span><span class="chip" style="background:#d1fae5;color:#047857">Instalado</span></div>
+      </div>
+      <div style="background:var(--bg);border-radius:28px;padding:30px;display:grid;gap:16px;align-content:center;justify-items:center">
+        <div class="pills" style="display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px"><span style="padding:8px 14px;border-radius:99px;background:var(--blue);color:#fff;font-weight:600">Início</span><span style="padding:8px 14px;color:#64748b;font-weight:600">Funil</span><span style="padding:8px 14px;color:#64748b;font-weight:600">Relatórios</span></div>
+        <div style="display:flex;gap:10px"><span class="circ" data-i="help"></span><span class="circ" data-i="bell"><b>3</b></span></div>
+        <span class="fab" style="position:relative;right:auto;bottom:auto" data-wa><i></i></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 PAINEL -->
+<section class="board" data-name="10-painel" style="background:linear-gradient(180deg,#dbeafe,#f2f5f9)">
+  <div class="pad" style="padding-bottom:0">
+    <p class="eyebrow">Início</p>
+    <h2 class="h" style="margin-top:18px">O dia do negócio <span class="serif" style="color:var(--blue)">numa tela</span></h2>
+    <p class="lead-t" style="margin-top:22px">Quantas pessoas viram o botão, quantas clicaram, quantas viraram contato e venda — e de onde elas vieram.</p>
+  </div>
+  <div style="margin:70px 100px 0;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -10px 60px -20px #1e3a8a55;height:740px" class="fit" data-mock="dashboard" data-w="1200"></div>
+</section>
+
+<!-- 11 FUNIL -->
+<section class="board dark" data-name="11-funil">
+  <div class="pad" style="padding-bottom:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end">
+    <div><p class="eyebrow" style="color:#93c5fd">Funil</p><h2 class="h" style="margin-top:18px;color:#fff">Arraste. <span class="serif" style="color:#60a5fa">Pronto.</span></h2></div>
+    <p class="lead-t">Etapas editáveis (até 10), filtros por origem e temperatura, e as etapas finais "Venda" e "Não convertido" fixas para os relatórios nunca mentirem.</p>
+  </div>
+  <div style="margin:0 100px 120px;border-radius:24px;overflow:hidden;height:750px" class="fit" data-mock="funnel" data-w="1200"></div>
+</section>
+
+<!-- 12 FICHA -->
+<section class="board" data-name="12-ficha" style="background:var(--bg)">
+  <div class="pad" style="padding-bottom:60px">
+    <p class="eyebrow">Ficha do contato</p>
+    <h2 class="h" style="margin-top:18px;max-width:1000px">Cada contato com a <span class="serif" style="color:var(--blue)">história inteira</span></h2>
+    <p class="lead-t" style="margin-top:22px">Origem, campanha, páginas visitadas, temperatura, etiquetas, responsável e lembrete de retorno — tudo a um clique do WhatsApp.</p>
+  </div>
+  <div style="margin:0 100px 120px;border-radius:24px;overflow:hidden;height:620px;box-shadow:0 30px 70px -30px #0f172a55" class="fit" data-mock="contact" data-w="1200"></div>
+</section>
+
+<!-- 13 WIDGET -->
+<section class="board" data-name="13-widget" style="background:#f6efe7">
+  <div class="pad" style="padding-bottom:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end">
+    <div><p class="eyebrow" style="color:#16a34a">No site do cliente</p><h2 class="h" style="margin-top:18px">Combina com <span class="serif" style="color:#16a34a">qualquer site</span></h2></div>
+    <p class="lead-t">Botão flutuante com balão e formulário que entra sozinho antes do rodapé. Usa a fonte do site, funciona em WordPress, Wix e Elementor, e o número de WhatsApp nunca aparece no código.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:50px;align-items:center;margin:0 100px 120px">
+    <div class="browser"><div class="bar"><i style="background:#f87171"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i><span>clinicasorriso.com.br</span></div><div class="fit" data-mock="site" data-w="810" style="height:506px"></div></div>
+    <div data-phone="mSite"></div>
+  </div>
+</section>
+
+<!-- 14 RELATÓRIOS -->
+<section class="board" data-name="14-relatorios" style="background:#fff">
+  <div class="pad" style="padding-bottom:60px">
+    <p class="eyebrow">Relatórios</p>
+    <h2 class="h" style="margin-top:18px">Descubra qual anúncio <span class="serif" style="color:#059669">vende de verdade</span></h2>
+  </div>
+  <div style="margin:0 100px 120px;border-radius:24px;overflow:hidden;height:700px;border:1px solid #e2e8f0" class="fit" data-mock="reports" data-w="1200"></div>
+</section>
+
+<!-- 15 MODO ESCURO -->
+<section class="board" data-name="15-escuro" style="background:#05080e">
+  <div class="glow" style="width:700px;height:500px;background:#1d4ed8;right:-200px;top:200px;opacity:.35"></div>
+  <div class="pad" style="padding-bottom:60px;position:relative"><p class="eyebrow" style="color:#93c5fd">Tema escuro</p><h2 class="h" style="margin-top:18px;color:#fff">Para quem atende <span class="serif" style="color:#60a5fa">até tarde</span></h2></div>
+  <div style="margin:0 100px 120px;border-radius:24px;overflow:hidden;height:740px;position:relative;border:1px solid #1f2a37" class="fit" data-mock="dashboardDark" data-w="1200"></div>
+</section>
+
+<!-- 16 CELULAR -->
+<section class="board" data-name="16-celular" style="background:linear-gradient(160deg,#2563eb,#1e3a8a)">
+  <div class="pad" style="padding-bottom:40px;text-align:center"><p class="eyebrow" style="color:#bfdbfe">No celular</p><h2 class="h" style="margin-top:18px;color:#fff">O CRM cabe <span class="serif" style="color:#bfdbfe">no bolso</span></h2></div>
+  <div style="display:flex;justify-content:center;gap:50px;padding-bottom:130px;align-items:flex-end">
+    <div data-phone="mFunnel" style="transform:translateY(40px)"></div><div data-phone="mDash"></div><div data-phone="mSite" style="transform:translateY(40px)"></div>
+  </div>
+</section>
+
+<!-- 17 OBRIGADO -->
+<section class="board dark" data-name="17-obrigado" style="height:760px;display:grid;place-items:center;text-align:center">
+  <div class="glow" style="width:600px;height:400px;background:#2563eb;left:400px;top:200px;opacity:.35"></div>
+  <div style="position:relative"><span data-mark="120"></span><h2 style="font-size:120px;letter-spacing:-.05em;font-weight:600;color:#fff;margin-top:40px">Obrigado<span class="serif" style="color:#60a5fa">!</span></h2>
+    <p style="color:#94a3b8;font-size:20px;margin-top:18px">pinaskit.vercel.app · Feito no Brasil</p></div>
+</section>
+
+</script>
+<script>
+  root.innerHTML = Function("return `" + tpl.textContent + "`")();
+  // Monta cada placeholder com a tela correspondente, encolhida para caber.
+  const M = { dashboard: () => dashboard(), dashboardDark: () => dashboard(true), funnel, contact, reports, site: () => site(true) };
+  document.querySelectorAll("[data-mock]").forEach((el) => {
+    const w = +el.dataset.w, k = w / 1440;
+    el.style.width = w + "px"; if (!el.style.height) el.style.height = 900 * k + "px";
+    el.innerHTML = `<div class="scale" style="transform:scale(${k})">${M[el.dataset.mock]()}</div>`;
+  });
+  document.querySelectorAll("[data-phone]").forEach((el) => (el.innerHTML = phone(window[el.dataset.phone]())));
+  document.querySelectorAll("[data-logo]").forEach((el) => (el.innerHTML = el.dataset.logo === "light" ? LOGO("#ffffff", "#60a5fa") : LOGO()));
+  document.querySelectorAll("[data-logo] .logo").forEach((l) => (l.style.fontSize = "1em"));
+  document.querySelectorAll("[data-mark]").forEach((el) => (el.innerHTML = MARK(+el.dataset.mark)));
+  document.querySelectorAll("[data-wa]").forEach((el) => el.insertAdjacentHTML("afterbegin", WA));
+  document.querySelectorAll("[data-i]").forEach((el) => el.insertAdjacentHTML("afterbegin", I(el.dataset.i, 17)));
+</script>
+</body></html>

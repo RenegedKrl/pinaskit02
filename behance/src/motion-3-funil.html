@@ -1,0 +1,49 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><link rel="stylesheet" href="styles.css">
+<style>
+  html, body { width:1920px; height:1080px; overflow:hidden; background:#0b1220; }
+  .cap { position:absolute; left:120px; top:80px; font-size:56px; font-weight:600; letter-spacing:-.03em; color:#fff; animation:fu .8s cubic-bezier(.2,.8,.2,1) .2s both; }
+  .cap em { font-family:"Instrument Serif"; font-weight:400; color:#60a5fa; }
+  .win { position:absolute; left:120px; top:220px; width:1680px; height:820px; border-radius:22px; overflow:hidden; animation:fu 1s cubic-bezier(.2,.8,.2,1) .4s both; }
+  .win .scale { transform:scale(1.1667); transform-origin:top left; }
+  .drag { position:absolute; z-index:9; width:268px; animation:drag 3.2s cubic-bezier(.6,0,.25,1) 1.8s both, hide 0s 5s both, fade 1s .4s both; }
+  @keyframes fade { from { opacity:0 } }
+  .drag .lead { animation:lift 3.2s 1.8s both; }
+  .src { animation:hide 0s 1.8s both; }
+  .dst { animation:show 0s 5s both; } .dst .lead { animation:landed 1.2s 5s both; }
+  .cnt-a::after { content:"3"; animation:a 0s 1.8s both; } .cnt-b::after { content:"1"; }
+  .spark { position:absolute; width:12px; height:12px; border-radius:50%; background:#10b981; z-index:10; animation:spark .9s cubic-bezier(.2,.8,.2,1) 5s both; opacity:0; }
+  .badge { position:absolute; right:150px; top:96px; background:#10b981; color:#fff; padding:14px 22px; border-radius:99px; font-size:22px; font-weight:700; animation:pop .6s cubic-bezier(.3,1.5,.5,1) 5.3s both; }
+  @keyframes fu { from { opacity:0; transform:translateY(40px) } }
+  @keyframes drag { 0% { left:var(--x0); top:var(--y0) } 15% { left:var(--x0); top:calc(var(--y0) - 20px) } 85%,100% { left:var(--x1); top:var(--y1) } }
+  @keyframes lift { 0% { transform:none } 12%,85% { transform:rotate(-4deg) scale(1.06); box-shadow:0 40px 60px -18px #000c } 100% { transform:none } }
+  @keyframes hide { to { visibility:hidden } } @keyframes show { from { visibility:hidden } to { visibility:visible } }
+  @keyframes landed { 0% { box-shadow:0 0 0 0 #10b98199 } 40% { box-shadow:0 0 0 10px #10b98144 } 100% { box-shadow:0 2px 6px -3px #0f172a22 } }
+  @keyframes a { to { content:"2" } }
+  @keyframes spark { 0% { opacity:0; transform:none } 3% { opacity:1; transform:translate(0,0) scale(1) } 100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(.3) } }
+  @keyframes pop { from { opacity:0; transform:scale(.5) } }
+</style></head><body>
+  <h2 class="cap">Arraste. <em>Venda registrada.</em></h2>
+  <div class="badge">+1 venda · Google Ads</div>
+  <div class="win fit" id="win"></div>
+  <div class="drag" id="ghost"></div>
+<script src="mocks.js"></script>
+<script>
+  win.innerHTML = `<div class="scale">${funnel()}</div>`;
+  const cols = win.querySelectorAll(".col");
+  const src = cols[0].querySelector(".lead"); src.classList.add("src");
+  cols[0].querySelector(".cnt").textContent = ""; cols[0].querySelector(".cnt").classList.add("cnt-a");
+  const dst = document.createElement("div"); dst.className = "dst"; dst.innerHTML = lead(0); cols[4].insertBefore(dst, cols[4].querySelector(".lead"));
+  cols[4].querySelector(".cnt").textContent = "2";
+  ghost.innerHTML = lead(0);
+  win.style.animation = "none";
+  const r0 = src.getBoundingClientRect(), r1 = dst.getBoundingClientRect();
+  win.style.animation = "";
+  ghost.style.setProperty("--x0", r0.left + "px"); ghost.style.setProperty("--y0", r0.top + "px");
+  ghost.style.setProperty("--x1", r1.left + "px"); ghost.style.setProperty("--y1", r1.top + "px");
+  ghost.style.transform = "scale(1.1667)"; ghost.style.transformOrigin = "top left"; ghost.style.width = r0.width / 1.1667 + "px";
+  // brilho ao soltar
+  for (let i = 0; i < 14; i++) { const s = document.createElement("i"); s.className = "spark"; const a = (i / 14) * Math.PI * 2;
+    s.style.left = r1.left + r1.width / 2 + "px"; s.style.top = r1.top + r1.height / 2 + "px";
+    s.style.setProperty("--dx", Math.cos(a) * 160 + "px"); s.style.setProperty("--dy", Math.sin(a) * 110 + "px");
+    s.style.background = ["#10b981", "#facc15", "#60a5fa"][i % 3]; document.body.appendChild(s); }
+</script></body></html>

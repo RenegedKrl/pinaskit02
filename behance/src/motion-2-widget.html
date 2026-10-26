@@ -1,0 +1,58 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><link rel="stylesheet" href="styles.css">
+<style>
+  html, body { width:1920px; height:1080px; overflow:hidden; background:#f6efe7; }
+  .scene { position:absolute; inset:0; }
+  .cap { position:absolute; left:120px; top:90px; font-size:54px; font-weight:600; letter-spacing:-.03em; color:#2a2320; }
+  .cap em { font-family:"Instrument Serif"; font-weight:400; color:#16a34a; }
+  .cap small { display:block; font-size:22px; font-weight:400; color:#6b5f58; letter-spacing:0; margin-top:10px; }
+  .win { position:absolute; left:387px; top:260px; width:1146px; height:760px; border-radius:20px; overflow:hidden; background:#fff; box-shadow:0 50px 100px -40px #2a232066; }
+  .win .bar { height:44px; background:#eef1f5; display:flex; align-items:center; gap:8px; padding:0 18px; }
+  .win .bar i { width:13px; height:13px; border-radius:50%; } .win .bar span { margin-left:16px; background:#fff; border-radius:8px; padding:6px 16px; font-size:13px; color:#64748b; }
+  .win .fit { position:relative; height:716px; overflow:hidden; } .win .scale { transform:scale(.7956); transform-origin:top left; position:absolute; }
+  .site .bubble { animation:pop .5s cubic-bezier(.3,1.5,.5,1) 2s both; transform-origin:100% 100%; }
+  .site .form { animation:hl 1s 3.4s both; }
+  .cursor { position:absolute; width:36px; height:36px; z-index:9; animation:cur 5.2s cubic-bezier(.6,0,.3,1) .4s both; }
+  .typed { position:absolute; inset:0; padding:10px 14px; color:#0f172a; background:#fff; border-radius:12px; overflow:hidden; white-space:nowrap; }
+  .t1 { animation:type 1s steps(9) 4.1s both; } .t2 { animation:type 1.1s steps(15) 5.2s both; }
+  .site .send { animation:press .4s 6.5s both; }
+  .s1 { animation:out .6s 7s forwards; }
+  .s2 { background:#0b1220; animation:fade .6s 7s both; }
+  .s2 .cap { color:#fff; } .s2 .cap small { color:#94a3b8; }
+  .app-win { position:absolute; left:120px; top:260px; width:1680px; height:760px; border-radius:20px; overflow:hidden; }
+  .toast { position:absolute; right:150px; top:290px; width:460px; background:#fff; border-radius:20px; padding:20px; box-shadow:0 30px 60px -20px #000a; display:flex; gap:14px; align-items:center; animation:toast .7s cubic-bezier(.3,1.4,.5,1) 7.9s both; z-index:5; }
+  .toast b { display:block; font-size:17px; } .toast span { color:#64748b; font-size:14px; }
+  .toast .tag { margin-left:auto; background:#dbeafe; color:#1d4ed8; padding:6px 10px; border-radius:99px; font-weight:700; font-size:13px; }
+  .newrow { animation:newrow 1.6s 8.4s both; }
+  @keyframes pop { from { transform:scale(.4) translateY(30px); opacity:0 } }
+  @keyframes cur { 0% { left:960px; top:1060px } 25%,34% { left:var(--fx); top:var(--fy) } 55%,78% { left:var(--nx); top:var(--ny) } 100% { left:var(--sx); top:var(--sy) } }
+  .fabpress { animation:press .4s 1.7s both; }
+  @keyframes type { from { width:0 } to { width:100% } }
+  @keyframes hl { 50% { box-shadow:0 0 0 6px #25D36655, 0 30px 60px -20px #2a232044 } }
+  @keyframes press { 50% { transform:scale(.95); filter:brightness(.9) } }
+  @keyframes out { to { opacity:0; transform:scale(.97) } } @keyframes fade { from { opacity:0 } }
+  @keyframes toast { from { transform:translateY(-40px) scale(.9); opacity:0 } }
+  @keyframes newrow { 0% { background:#dcfce7 } 100% { background:transparent } }
+</style></head><body>
+<div class="scene s1">
+  <h2 class="cap">O visitante chega pelo anúncio… <small>clinicasorriso.com.br/?utm_source=google&amp;utm_campaign=promo-outubro</small></h2>
+  <div class="win"><div class="bar"><i style="background:#f87171"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i><span>clinicasorriso.com.br/?utm_source=google</span></div><div class="fit" id="siteBox"></div></div>
+  <svg class="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#0f172a" stroke="#fff" stroke-width="1.5"/></svg>
+</div>
+<div class="scene s2">
+  <h2 class="cap">…e vira contato <em>com a origem certa.</em><small>No WhatsApp da clínica e no painel, ao mesmo tempo.</small></h2>
+  <div class="app-win fit" id="app"></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script src="mocks.js"></script>
+<script>
+  siteBox.innerHTML = `<div class="scale">${window.site(true)}</div>`;
+  const inputs = siteBox.querySelectorAll(".form .inp");
+  inputs[0].style.position = "relative"; inputs[0].insertAdjacentHTML("beforeend", `<span class="typed t1">Ana Souza</span>`);
+  const wa = siteBox.querySelectorAll(".form .row .inp")[1]; wa.style.position = "relative"; wa.insertAdjacentHTML("beforeend", `<span class="typed t2">(11) 98765-4321</span>`);
+  const cur = document.querySelector(".cursor"), mid = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - 6 + "px", r.top + r.height / 2 - 4 + "px"]; };
+  const fab = siteBox.querySelector(".fab"); fab.classList.add("fabpress");
+  [["f", fab], ["n", inputs[0]], ["s", siteBox.querySelector(".form .send")]].forEach(([k, el]) => { const [x, y] = mid(el); cur.style.setProperty(`--${k}x`, x); cur.style.setProperty(`--${k}y`, y); });
+  app.innerHTML = `<div class="scale" style="transform:scale(1.1667);transform-origin:top left">${dashboard()}</div>`;
+  app.querySelector("table tr").classList.add("newrow");
+  toast.innerHTML = `${avatar("Ana Souza", 0, 48)}<div><b>Novo contato: Ana Souza</b><span>Google Ads · promo-outubro · agora</span></div><span class="tag">Quente</span>`;
+</script></body></html>
