@@ -9,7 +9,7 @@ import { Button } from "@/components/ui";
 const input = "h-10 w-full rounded-lg border border-line bg-card px-3 text-sm";
 
 /** Janela para criar, renomear, reordenar e apagar etapas do funil (só dono e admin). */
-export function StageEditor({ stages }: { stages: Stage[] }) {
+export function StageEditor({ stages, pipelineId = null }: { stages: Stage[]; pipelineId?: string | null }) {
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -86,7 +86,7 @@ export function StageEditor({ stages }: { stages: Stage[] }) {
           })}
         </ul>
 
-        <form className="flex gap-2 border-t border-line px-5 py-4" onSubmit={(e) => { e.preventDefault(); run(() => createStage(newName), () => setNewName("")); }}>
+        <form className="flex gap-2 border-t border-line px-5 py-4" onSubmit={(e) => { e.preventDefault(); run(() => createStage(newName, pipelineId), () => setNewName("")); }}>
           <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={40} placeholder="Nova etapa, ex.: Visita marcada" aria-label="Nome da nova etapa" className={input} disabled={stages.length >= MAX_STAGES} />
           <Button disabled={pending || stages.length >= MAX_STAGES || !newName.trim()}><Plus size={16} />Criar</Button>
         </form>

@@ -2,7 +2,7 @@
 import { STATUS } from "./copy";
 
 export type StageKind = "new" | "open" | "won" | "lost";
-export interface Stage { id: string; key: string; name: string; hint: string | null; position: number; kind: StageKind }
+export interface Stage { id: string; key: string; name: string; hint: string | null; position: number; kind: StageKind; pipeline_id?: string | null }
 
 export const MAX_STAGES = 10;
 
@@ -20,7 +20,7 @@ export const DEFAULT_STAGES: Stage[] = STATUS.map((s, i) => ({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStages(supabase: any, workspaceId: string): Promise<Stage[]> {
-  const { data } = await supabase.from("pipeline_stages").select("id, key, name, hint, position, kind").eq("workspace_id", workspaceId);
+  const { data } = await supabase.from("pipeline_stages").select("id, key, name, hint, position, kind, pipeline_id").eq("workspace_id", workspaceId);
   return data?.length ? sortStages(data as Stage[]) : DEFAULT_STAGES;
 }
 

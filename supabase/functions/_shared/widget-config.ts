@@ -163,6 +163,8 @@ export function sourceLabel(a: {
   const src = (a.utm_source ?? "").toLowerCase();
   const med = (a.utm_medium ?? "").toLowerCase();
   const ids = a.click_ids ?? {};
+  if (med === "qrcode") return "Loja física (QR Code)";
+  if (med === "bio") return /instagram|insta|ig/.test(src) || !src ? "Instagram (link da bio)" : "Link da bio";
   if (ids.gclid || ids.gbraid || ids.wbraid || /google_ads|adwords/.test(src) || (src === "google" && /cpc|paid|ppc/.test(med))) return "Google Ads";
   if (ids.fbclid && !src) return "Meta Ads";
   // "ig", "fb" e "meta" só valem como palavra inteira (evita "digital" virar Instagram)

@@ -23,7 +23,7 @@ export function NotificationBell({ className = "", menu, compact }: { className?
     document.addEventListener("mousedown", close); return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
-  const count = (data?.newCount ?? 0) + (data?.followups ?? 0);
+  const count = (data?.newCount ?? 0) + (data?.followups ?? 0) + (data?.waiting ?? 0) + (data?.tasks ?? 0);
   function toggle() {
     const next = !open; setOpen(next);
     if (next && data?.newCount) markNotificationsSeen().catch(() => {}); // abriu = viu (o contador zera na próxima atualização)
@@ -42,6 +42,16 @@ export function NotificationBell({ className = "", menu, compact }: { className?
       {open && (
         <div className={cn("absolute z-50 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-2 text-ink shadow-2xl", menu ? "left-full top-0 ml-2" : "right-0 top-full mt-2")}>
           <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-mute">Avisos</p>
+          {!!data?.waiting && (
+            <Link href="/painel/hoje" onClick={() => setOpen(false)} className="mb-1 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-800 hover:brightness-95">
+              <BellRing size={15} />{data.waiting} {data.waiting === 1 ? "contato esperando" : "contatos esperando"} atendimento há +15 min
+            </Link>
+          )}
+          {!!data?.tasks && (
+            <Link href="/painel/hoje" onClick={() => setOpen(false)} className="mb-1 flex items-center gap-2 rounded-lg bg-primary-soft px-3 py-2 text-sm font-semibold text-primary hover:brightness-95">
+              <BellRing size={15} />{data.tasks} {data.tasks === 1 ? "tarefa" : "tarefas"} para hoje ou atrasadas
+            </Link>
+          )}
           {!!data?.followups && (
             <Link href="/painel/contatos?retorno=pendente" onClick={() => setOpen(false)} className="mb-1 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900 hover:brightness-95">
               <BellRing size={15} />{data.followups} {data.followups === 1 ? "retorno para hoje" : "retornos para hoje"}
@@ -52,7 +62,7 @@ export function NotificationBell({ className = "", menu, compact }: { className?
               <p className="text-sm font-semibold">Novo contato: {l.name || "Sem nome"}</p>
               <p className="text-xs text-mute">{l.source_label || "Acesso direto"} · {dateTime(l.created_at)}</p>
             </Link>
-          )) : !data?.followups && <p className="px-3 py-4 text-center text-sm text-mute">Nenhum aviso novo. Quando chegar um contato, ele aparece aqui.</p>}
+          )) : !data?.followups && !data?.waiting && !data?.tasks && <p className="px-3 py-4 text-center text-sm text-mute">Nenhum aviso novo. Quando chegar um contato, ele aparece aqui.</p>}
           {(data?.newCount ?? 0) > (data?.leads.length ?? 0) && <Link href="/painel/contatos" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm font-semibold text-primary">Ver todos os {data!.newCount} novos</Link>}
         </div>
       )}

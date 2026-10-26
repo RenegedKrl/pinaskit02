@@ -6,8 +6,8 @@ import { Card } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 const OPTIONS = [
+  { id: "lateral", label: "Menu lateral (padrão)", desc: "Menu escuro à esquerda, que pode ser recolhido." },
   { id: "topo", label: "Menu no topo", desc: "Abas em cima, mais espaço para o conteúdo." },
-  { id: "lateral", label: "Menu lateral", desc: "Menu escuro à esquerda, que pode ser recolhido." },
 ] as const;
 
 function Mini({ side }: { side: boolean }) {

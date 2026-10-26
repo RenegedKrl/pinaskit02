@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Upload } from "lucide-react";
+import { CopyCheck, Download, Upload } from "lucide-react";
 import { canEdit, getSession } from "@/lib/session";
 import { TEMP } from "@/lib/copy";
 import { getStages, stageName } from "@/lib/stages";
@@ -24,6 +24,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
     supabase.from("widgets").select("id, name").eq("workspace_id", workspace.id).order("name"),
     supabase.from("workspace_members").select("user_id, email").eq("workspace_id", workspace.id),
   ]);
+  const { data: cfields } = await supabase.from("custom_fields").select("key, label").eq("workspace_id", workspace.id).order("position");
   const allTags = [...new Set((srcRows ?? []).flatMap((r) => r.tags ?? []))].sort() as string[];
   const reasons = [...new Map((srcRows ?? []).filter((r) => r.lost_reason).map((r) => [r.lost_reason!.toLowerCase(), r.lost_reason!])).values()].sort();
   const who = (id: string | null) => (id ? members?.find((m) => m.user_id === id)?.email?.split("@")[0] ?? "Alguém da equipe" : null);
@@ -36,6 +37,7 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
     <>
       <PageHeader title="Contatos" desc="Pessoas que deixaram o contato pelo seu site (leads)." action={
         <div className="flex flex-wrap gap-2">
+          <Link href="/painel/contatos/duplicados" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><CopyCheck size={18} />Repetidos</Link>
           {edit && <Link href="/painel/contatos/importar" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Upload size={18} />Importar</Link>}
           <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
         </div>
@@ -51,6 +53,12 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
         <Select name="resp" defaultValue={f.resp ?? ""} aria-label="Responsável"><option value="">Todos os responsáveis</option><option value="eu">Meus contatos</option><option value="ninguem">Sem responsável</option>{(members ?? []).filter((m) => m.user_id !== user.id).map((m) => <option key={m.user_id} value={m.user_id}>{m.email}</option>)}</Select>
         {reasons.length > 0 && <Select name="motivo" defaultValue={f.motivo ?? ""} aria-label="Motivo da perda"><option value="">Todo motivo de perda</option>{reasons.map((r) => <option key={r} value={r}>{r}</option>)}<option value="sem">Sem motivo informado</option></Select>}
         {allTags.length > 0 && <Select name="tag" defaultValue={f.tag ?? ""} aria-label="Etiqueta"><option value="">Todas as etiquetas</option>{allTags.map((t) => <option key={t} value={t}>{t}</option>)}</Select>}
+        {!!cfields?.length && (
+          <div className="flex gap-2">
+            <Select name="cf" defaultValue={f.cf ?? ""} aria-label="Campo personalizado" className="w-40 shrink-0"><option value="">Campo…</option>{cfields.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</Select>
+            <Input name="cv" defaultValue={f.cv} placeholder="contém…" aria-label="Valor do campo" />
+          </div>
+        )}
         <Select name="temp" defaultValue={f.temp ?? ""} aria-label="Temperatura"><option value="">Toda temperatura</option>{Object.entries(TEMP).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}</Select>
         <div className="flex gap-2">
           <Select name="status" defaultValue={f.status ?? ""} aria-label="Etapa"><option value="">Todas as etapas</option>{stages.map((s) => <option key={s.key} value={s.key}>{s.name}</option>)}</Select>

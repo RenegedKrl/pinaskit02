@@ -188,6 +188,88 @@ begin
   begin update workspace_members set whatsapp_e164 = '12ab' where user_id = '00000000-0000-0000-0000-00000000000a'; raise exception 'aceitou WhatsApp inválido';
   exception when check_violation then null; end;
 end $$;
+-- ---------- CRM completo: tarefas, negócios, funis, automações, propostas, agenda, visão restrita ----------
+insert into leads (workspace_id, phone_e164, name, owner_id)
+select workspace_id, '5511955550001', 'Lead do A', user_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000a';
+insert into leads (workspace_id, phone_e164, name)
+select workspace_id, '5511955550002', 'Lead sem dono' from t_ws where user_id = '00000000-0000-0000-0000-00000000000a';
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000a', true);
+do $$ declare ws_a uuid := (select workspace_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000a');
+               lead_a uuid := (select id from leads where phone_e164 = '5511955550001');
+               lead_b uuid := (select id from leads where workspace_id <> ws_a limit 1);
+               pl uuid;
+begin
+  if lead_b is not null then raise exception 'A enxerga contato de B'; end if;
+  insert into tasks (workspace_id, lead_id, title) values (ws_a, lead_a, 'Ligar');
+  insert into deals (workspace_id, lead_id, title, value) values (ws_a, lead_a, 'Implante', 1500);
+  insert into custom_fields (workspace_id, key, label) values (ws_a, 'cpf', 'CPF');
+  insert into products (workspace_id, name, price) values (ws_a, 'Limpeza', 200);
+  -- proposta: cria, mas a resposta só vem do cliente (servidor)
+  insert into proposals (workspace_id, lead_id, title, items, total) values (ws_a, lead_a, 'Orçamento', '[{"name":"x","qty":1,"price":10}]', 10);
+  begin update proposals set status = 'accepted' where lead_id = lead_a; raise exception 'navegador aceitou proposta';
+  exception when raise_exception then if sqlerrm = 'navegador aceitou proposta' then raise; end if; end;
+  -- funis: extra só com etapas livres, até 5 funis
+  insert into pipelines (workspace_id, name) values (ws_a, 'Pós-venda') returning id into pl;
+  insert into pipeline_stages (workspace_id, pipeline_id, key, name, kind) values (ws_a, pl, 'pos_1', 'Entrada', 'open');
+  begin insert into pipeline_stages (workspace_id, pipeline_id, key, name, kind) values (ws_a, pl, 'pos_won', 'Ganhou', 'won'); raise exception 'etapa fixa em funil extra';
+  exception when raise_exception then if sqlerrm = 'etapa fixa em funil extra' then raise; end if; end;
+  begin delete from pipelines where workspace_id = ws_a and is_main; raise exception 'apagou funil principal';
+  exception when raise_exception then if sqlerrm = 'apagou funil principal' then raise; end if; end;
+  -- automação: entrar em "proposta" cria tarefa
+  insert into automations (workspace_id, name, trigger, stage_key, task_title, task_days) values (ws_a, 'Cobrar', 'stage_enter', 'proposta', 'Cobrar resposta', 2);
+  update leads set status = 'proposta' where id = lead_a;
+  -- rotina diária e fila só no servidor
+  begin perform run_daily_crm(); raise exception 'navegador rodou a rotina diária';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+do $$ declare ws_a uuid := (select workspace_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000a');
+               lead_a uuid := (select id from leads where phone_e164 = '5511955550001'); bp uuid; n int;
+begin
+  if not exists (select 1 from tasks where lead_id = lead_a and title = 'Cobrar resposta' and source = 'automation' and due_at > now() + interval '1 day') then
+    raise exception 'automação de etapa não criou a tarefa'; end if;
+  if (select count(*) from pipelines where workspace_id = ws_a) <> 2 then raise exception 'funil extra não criado'; end if;
+  -- agenda: o mesmo horário não pode ser marcado duas vezes
+  insert into booking_pages (workspace_id, slug, title) values (ws_a, 'teste-rls-agenda', 'Avaliação') returning id into bp;
+  insert into appointments (workspace_id, page_id, starts_at, ends_at, name, phone) values (ws_a, bp, '2030-01-07 12:00+00', '2030-01-07 12:30+00', 'Ana', '5511900000000');
+  begin insert into appointments (workspace_id, page_id, starts_at, ends_at, name, phone) values (ws_a, bp, '2030-01-07 12:00+00', '2030-01-07 12:30+00', 'Bia', '5511900000001'); raise exception 'horário duplo';
+  exception when unique_violation then null; end;
+  -- rotina diária: contato parado e aniversário viram tarefa (uma vez)
+  insert into automations (workspace_id, name, trigger, days, task_title) values (ws_a, 'Parado', 'stale', 1, 'Retomar conversa');
+  update leads set updated_at = now() - interval '5 days', birthday = (now() at time zone 'America/Sao_Paulo')::date - interval '30 years' where id = lead_a;
+  perform run_daily_crm(); perform run_daily_crm();
+  select count(*) into n from tasks where lead_id = lead_a and title = 'Retomar conversa';
+  if n <> 1 then raise exception 'contato parado: esperava 1 tarefa, veio %', n; end if;
+  if (select count(*) from tasks where lead_id = lead_a and source = 'birthday') <> 1 then raise exception 'aniversário não virou tarefa (ou repetiu)'; end if;
+  -- visão restrita: C é membro de A com "só os meus"
+  insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000c', 'c@teste.com');
+  insert into workspace_members (workspace_id, user_id, role, email, see_only_own) values (ws_a, '00000000-0000-0000-0000-00000000000c', 'member', 'c@teste.com', true);
+end $$;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000c', true);
+do $$ begin
+  if exists (select 1 from leads where phone_e164 = '5511955550001') then raise exception 'C (só os meus) viu contato do A'; end if;
+  if not exists (select 1 from leads where phone_e164 = '5511955550002') then raise exception 'C não viu contato sem responsável'; end if;
+  if exists (select 1 from tasks where title = 'Ligar') then raise exception 'C viu tarefa de contato que não é dele'; end if;
+  if exists (select 1 from deals where title = 'Implante') then raise exception 'C viu negociação de contato que não é dele'; end if;
+  update leads set name = 'invadido' where phone_e164 = '5511955550001';
+  begin perform merge_leads((select id from leads where phone_e164 = '5511955550002'), (select id from leads where phone_e164 = '5511955550002')); raise exception 'membro juntou contatos';
+  exception when raise_exception then if sqlerrm = 'membro juntou contatos' then raise; end if; end;
+end $$;
+reset role;
+do $$ begin
+  if (select name from leads where phone_e164 = '5511955550001') = 'invadido' then raise exception 'C alterou contato do A'; end if;
+end $$;
+-- juntar repetidos (dono): histórico, tarefas e negociações passam para o que fica
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000a', true);
+select merge_leads((select id from leads where phone_e164 = '5511955550001'), (select id from leads where phone_e164 = '5511955550002'));
+reset role;
+do $$ begin
+  if exists (select 1 from leads where phone_e164 = '5511955550002') then raise exception 'merge não apagou o repetido'; end if;
+  if not exists (select 1 from lead_activities where type = 'merge') then raise exception 'merge não registrou no histórico'; end if;
+end $$;
 -- apagar a conta inteira leva junto etapas e contatos
 delete from workspaces where id in (select workspace_id from t_ws where user_id = '00000000-0000-0000-0000-00000000000b');
 -- anon não lê nada (no Supabase ele recebe lista vazia; sem a permissão, um erro — os dois servem)

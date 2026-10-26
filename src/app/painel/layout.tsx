@@ -11,7 +11,7 @@ import { isSuperAdmin } from "@/lib/admin-metrics";
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const { workspace: w, user } = await getSession();
-  const side = (await cookies()).get("pk-layout")?.value === "lateral";
+  const side = (await cookies()).get("pk-layout")?.value !== "topo"; // padrão: menu lateral
   const days = trialDaysLeft(w);
   const trialText = w.plan_status === "trial" ? `Teste grátis: ${days} ${days === 1 ? "dia restante" : "dias restantes"}` : null;
   const banner =
@@ -35,7 +35,7 @@ export default async function PainelLayout({ children }: { children: React.React
 
   if (side) return (
     <div className="flex min-h-dvh">
-      <Sidebar trialText={trialText} signOut={signOut} />
+      <Sidebar trialText={trialText} signOut={signOut} superAdmin={isSuperAdmin(user.email)} />
       <div className="relative min-w-0 flex-1 pb-20 md:pb-0">
         {content}
         <div className="fixed right-3 top-3 z-40 md:hidden"><NotificationBell /></div>

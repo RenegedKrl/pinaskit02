@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { TemplatesManager } from "@/components/painel/templates-manager";
 import { LayoutPicker } from "@/components/painel/layout-picker";
 import { AlertsCard, RotationCard, WebhookCard } from "@/components/painel/growth-cards";
+import { FieldsManager, type FieldRow } from "@/components/painel/fields-manager";
 import { Button, Card, Field, Input, PageHeader, Select } from "@/components/ui";
 import { addDomain, deleteData, invite, removeDomain, removeInvite, removeMember, saveBusiness } from "./actions";
 
@@ -18,6 +19,7 @@ export default async function Config() {
     supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
   ]);
   const me = members?.find((m) => m.user_id === user.id);
+  const { data: fields } = await supabase.from("custom_fields").select("id, label, type, options").eq("workspace_id", workspace.id).order("position");
   const { data: hook } = admin
     ? await supabase.from("workspaces").select("webhook_url, webhook_secret, webhook_last_status, webhook_last_at").eq("id", workspace.id).single()
     : { data: null };
@@ -25,9 +27,10 @@ export default async function Config() {
   return (
     <>
       <PageHeader title="Configurações" desc="Aparência, dados do negócio, sites autorizados, equipe e mensagens prontas." />
-      <div className="mb-4"><LayoutPicker current={(await cookies()).get("pk-layout")?.value === "lateral" ? "lateral" : "topo"} /></div>
+      <div className="mb-4"><LayoutPicker current={(await cookies()).get("pk-layout")?.value === "topo" ? "topo" : "lateral"} /></div>
       <div className="mb-4"><TemplatesManager templates={templates ?? []} edit={canEdit(role)} /></div>
       <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <FieldsManager fields={(fields ?? []) as FieldRow[]} admin={admin} />
         <AlertsCard newLead={me?.alert_new_lead ?? true} daily={me?.alert_daily ?? true} />
         {admin && <RotationCard members={members ?? []} />}
         {admin && <div className="lg:col-span-2"><WebhookCard url={hook?.webhook_url ?? ""} secret={hook?.webhook_secret ?? ""} lastStatus={hook?.webhook_last_status ?? null} lastAt={hook?.webhook_last_at ?? null} /></div>}

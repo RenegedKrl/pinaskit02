@@ -1,6 +1,6 @@
 import { since } from "@/lib/utils";
 
-export interface LeadFilters { p?: string; q?: string; origem?: string; temp?: string; status?: string; ponto?: string; resp?: string; tag?: string; motivo?: string; retorno?: string; pag?: string; me?: string }
+export interface LeadFilters { p?: string; q?: string; origem?: string; temp?: string; status?: string; ponto?: string; resp?: string; tag?: string; motivo?: string; cf?: string; cv?: string; retorno?: string; pag?: string; me?: string }
 
 // Genérico: devolve o mesmo tipo de consulta recebido, mantendo o tipo das linhas.
 export function applyFilters<Q>(query: Q, f: LeadFilters): { q: Q; days: number } {
@@ -17,6 +17,7 @@ export function applyFilters<Q>(query: Q, f: LeadFilters): { q: Q; days: number 
   if (f.motivo === "sem") q = q.is("lost_reason", null);
   else if (f.motivo) q = q.ilike("lost_reason", f.motivo.replace(/[%_\\]/g, "").slice(0, 120));
   if (f.resp && /^[0-9a-f-]{36}$/i.test(f.resp)) q = q.eq("owner_id", f.resp);
+  if (f.cf && /^[a-z0-9_]{2,30}$/.test(f.cf) && f.cv) q = q.ilike(`custom->>${f.cf}`, `%${f.cv.replace(/[%_\\,()]/g, "").slice(0, 60)}%`);
   if (f.retorno === "pendente") q = q.lte("next_followup_at", new Date(Date.now() + 86_400_000).toISOString());
   if (f.q) {
     const s = f.q.replace(/[%,()]/g, "").slice(0, 60);

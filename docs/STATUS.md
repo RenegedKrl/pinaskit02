@@ -39,6 +39,7 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 17. ~~Fase 2 (repo pinaskit02, pasta Pinas Kit 02)~~ 26/10: migração 0007 — motivo da perda + janela de valor/motivo ao fechar no funil e relatório de motivos; avisos por pessoa + resumo diário (função daily-digest, cron 11h UTC); pixels Meta/GA4/Ads/GTM, horário de atendimento e mapa de campos no widget; rodízio (next_attendant); webhook assinado + Planilhas; importar CSV; /painel/admin (SUPERADMIN_EMAILS, MRR do Asaas); e-mail dia 2 sem instalação + fim do teste no dia 6
 
+18. ~~CRM completo (pinaskit02)~~ 26/10: migrações 0008/0009 — Meu dia + tarefas, sequências, negócios/produtos/previsão, campos personalizados, automações + pós-venda (cron daily-crm), tempo de resposta, proposta com aceite (/p), agenda (/agendar), bio + QR (/l), metas/ranking/NPS (/painel/equipe, /pesquisa), vários funis, repetidos, ver só os meus. Menu lateral é o padrão; tutorial atualizado. 50 testes, 16 de navegador, RLS no Postgres embutido
 ## Decisões
 - Um plano em 4 períodos (mensal, trimestral, semestral, anual), 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.
