@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
-const fn = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
+const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 const config: NextConfig = {
-  // link direto bonito: seudominio.com/b/CHAVE → função b-redirect
+  // link direto bonito: seudominio.com/b/CHAVE → função b-redirect (sem Supabase configurado, fica desligado)
   async rewrites() {
-    return [{ source: "/b/:k", destination: `${fn}/b-redirect?k=:k` }];
+    return base ? [{ source: "/b/:k", destination: `${base}/functions/v1/b-redirect?k=:k` }] : [];
   },
   async headers() {
     return [
