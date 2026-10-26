@@ -37,6 +37,8 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 16. ~~Escolha de layout~~ 25/10: Configurações › Aparência do painel (layout-picker.tsx) alterna menu no topo / lateral; fica no cookie pk-layout (por navegador), lido no layout do painel
 15. ~~Velocidade~~ 25/10: Vercel (iad1) e Supabase (us-east-1) na mesma região — não mudar só um. Consultas de Contatos e ficha em paralelo; getSession usa getClaims (sem 2ª ida ao Auth). Contatos ~2,2 s → ~0,9 s no teste local
 
+17. ~~Fase 2 (repo pinaskit02, pasta Pinas Kit 02)~~ 26/10: migração 0007 — motivo da perda + janela de valor/motivo ao fechar no funil e relatório de motivos; avisos por pessoa + resumo diário (função daily-digest, cron 11h UTC); pixels Meta/GA4/Ads/GTM, horário de atendimento e mapa de campos no widget; rodízio (next_attendant); webhook assinado + Planilhas; importar CSV; /painel/admin (SUPERADMIN_EMAILS, MRR do Asaas); e-mail dia 2 sem instalação + fim do teste no dia 6
+
 ## Decisões
 - Um plano em 4 períodos (mensal, trimestral, semestral, anual), 7 dias grátis sem cartão. Asaas apenas.
 - Fora do MVP: OAuth Meta/Google, CAPI, testes A/B, IA, criptografia por campo, inbox de conversas.

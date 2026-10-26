@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { canEdit, getSession } from "@/lib/session";
 import { randomKey } from "@/lib/utils";
-import { mergeConfig, type Mode, type WidgetConfig } from "@shared/widget-config";
+import { cleanExtras, mergeConfig, type Mode, type WidgetConfig } from "@shared/widget-config";
 
 export interface WidgetInput { name: string; mode: Mode; whatsapp: string; is_active: boolean; config: WidgetConfig }
 
@@ -16,7 +16,7 @@ export async function saveWidget(id: string | null, input: WidgetInput): Promise
   if (!input.name.trim()) return { error: "Dê um nome para identificar este ponto de contato." };
   if (phone.length < 12 || phone.length > 15) return { error: "Informe o WhatsApp com código do país e DDD. Ex.: 55 11 99999-8888." };
   if (!MODES.has(input.mode)) return { error: "Modo inválido." };
-  const config = mergeConfig(input.config);
+  const config = cleanExtras(mergeConfig(input.config));
   const row = { name: input.name.trim().slice(0, 80), mode: input.mode, whatsapp_e164: phone, is_active: input.is_active, config };
   if (id) {
     const { error } = await supabase.from("widgets").update(row).eq("id", id).eq("workspace_id", workspace.id);

@@ -151,3 +151,52 @@ await run("CSS agressivo do site não quebra o formulário", {
   await page.waitForTimeout(400);
   assert.equal(leads.length, 1, "o CSS do site não deveria esconder os campos do formulário");
 });
+
+// ---------- Fase 2 ----------
+await run("pixels: avisa Meta, GA4, Google Ads e GTM ao enviar", {
+  mode: "form", config: { pixels: { meta: true, google: true, adsSendTo: "AW-123456789/AbCdEf" } },
+  body: `<script>window.__px=[];window.fbq=(...a)=>__px.push(["fbq",...a]);window.gtag=(...a)=>__px.push(["gtag",...a]);window.dataLayer=[];</script><main>Oi</main><footer>R</footer>`,
+}, async ({ page, leads }) => {
+  await fill(page);
+  await page.waitForTimeout(400);
+  assert.equal(leads.length, 1);
+  const px = await page.evaluate(() => window.__px);
+  assert.deepEqual(px[0], ["fbq", "track", "Lead", { content_name: "page_form" }]);
+  assert.deepEqual(px[1], ["gtag", "event", "generate_lead", { method: "page_form" }]);
+  assert.deepEqual(px[2], ["gtag", "event", "conversion", { send_to: "AW-123456789/AbCdEf" }]);
+  assert.equal(await page.evaluate(() => window.dataLayer[0].event), "pinas_lead");
+});
+
+await run("pixels: sem consentimento não dispara nada", {
+  mode: "form", config: { pixels: { meta: true, google: true } },
+  body: `<script>window.PinasKitConsent=false;window.__px=[];window.fbq=(...a)=>__px.push(a);window.gtag=(...a)=>__px.push(a);</script><main>Oi</main><footer>R</footer>`,
+}, async ({ page, leads }) => {
+  await fill(page);
+  await page.waitForTimeout(400);
+  assert.equal(leads.length, 1, "o contato é enviado mesmo assim");
+  assert.equal((await page.evaluate(() => window.__px)).length, 0);
+});
+
+await run("fora do horário: balão avisa e sem bolinha de online", {
+  mode: "button", config: { greeting: "Olá!", buttonForm: true, online: true, hours: { enabled: true, days: [], from: "08:00", to: "18:00", offMessage: "Voltamos às 8h" } },
+  body: `<main>Oi</main>`,
+}, async ({ page, leads }) => {
+  const btn = page.locator("#pinas-btn");
+  assert.equal(await btn.locator(".dot").count(), 0, "sem bolinha de online");
+  await btn.locator(".fab").click();
+  assert.match(await btn.locator(".bal").innerText(), /Voltamos às 8h/);
+  await fill(page, "#pinas-btn .bal");
+  await page.waitForTimeout(400);
+  assert.equal(leads.length, 1, "captura o contato mesmo fora do horário");
+});
+
+await run("formulário do site: usa os campos escolhidos no painel", {
+  mode: "form", config: { form: { existing: { action: "connect", selector: "#orc", map: { phone: "fone_cliente", name: "quem", email: "", message: "" } } } },
+  body: `<form id="orc" onsubmit="event.preventDefault()"><input type="tel" name="fixo" value="1133334444"><input name="quem" value="João Mapeado"><input name="fone_cliente" value="(21) 98888-7777"><button>Enviar</button></form>`,
+}, async ({ page, leads }) => {
+  await page.locator("#orc button").click();
+  await page.waitForTimeout(500);
+  assert.equal(leads.length, 1);
+  assert.equal(leads[0].phone, "5521988887777", "usou o telefone mapeado, não o primeiro tel da página");
+  assert.equal(leads[0].name, "João Mapeado");
+});

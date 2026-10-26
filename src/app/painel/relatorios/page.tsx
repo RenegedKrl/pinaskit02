@@ -3,7 +3,7 @@ import { ChevronRight, Download, Lightbulb } from "lucide-react";
 import { getSession } from "@/lib/session";
 import { brl } from "@/lib/plan";
 import { since } from "@/lib/utils";
-import { bestRow, conversion, GROUP_LABEL, nextGroup, normalize, type ReportGroup } from "@/lib/report";
+import { bestRow, conversion, GROUP_LABEL, lostReasons, nextGroup, normalize, type ReportGroup } from "@/lib/report";
 import { Card, Empty, PageHeader } from "@/components/ui";
 
 type SP = { p?: string; por?: string; origem?: string; campanha?: string };
@@ -14,9 +14,14 @@ export default async function Relatorios({ searchParams }: { searchParams: Promi
   const { supabase, workspace } = await getSession();
   const days = PERIODS.includes(Number(sp.p)) ? Number(sp.p) : 30;
   const group: ReportGroup = sp.campanha ? "anuncio" : sp.origem ? "campanha" : sp.por === "campanha" || sp.por === "anuncio" ? sp.por : "origem";
-  const { data } = await supabase.rpc("report_by_source", {
-    p_ws: workspace.id, p_from: since(days), p_group: group, p_source: sp.origem ?? null, p_campaign: sp.campanha ?? null,
-  });
+  const [{ data }, { data: lostStages }] = await Promise.all([
+    supabase.rpc("report_by_source", { p_ws: workspace.id, p_from: since(days), p_group: group, p_source: sp.origem ?? null, p_campaign: sp.campanha ?? null }),
+    supabase.from("pipeline_stages").select("key").eq("workspace_id", workspace.id).eq("kind", "lost"),
+  ]);
+  let lostQ = supabase.from("leads").select("lost_reason").eq("workspace_id", workspace.id).gte("created_at", since(days))
+    .in("status", (lostStages ?? []).map((s) => s.key)).limit(2000);
+  if (sp.origem) lostQ = lostQ.eq("source_label", sp.origem);
+  const reasons = lostReasons((await lostQ).data ?? []);
   const { rows, total } = normalize(data as Record<string, unknown>[] | null);
   const best = group === "origem" ? bestRow(rows) : null;
   const max = Math.max(1, ...rows.map((r) => r.leads));
@@ -103,6 +108,21 @@ export default async function Relatorios({ searchParams }: { searchParams: Promi
                 <td className="px-4 py-3 text-right">{total.won}</td><td className="px-4 py-3 text-right">{conversion(total.won, total.leads)}</td><td className="px-4 py-3 text-right">{total.revenue ? brl(total.revenue) : "—"}</td></tr>
             </tfoot>
           </table>
+        </Card>
+      )}
+      {reasons.length > 0 && (
+        <Card className="mt-4">
+          <h2 className="font-display font-semibold">Por que os contatos não compram</h2>
+          <p className="mb-4 text-sm text-mute">Motivos marcados ao mover para "Não convertido"{sp.origem ? ` · ${sp.origem}` : ""}.</p>
+          <ul className="space-y-2.5">
+            {reasons.map((r) => (
+              <li key={r.reason} className="grid grid-cols-[minmax(0,12rem)_1fr_auto] items-center gap-3 text-[15px]">
+                <span className="truncate">{r.reason}</span>
+                <span className="h-2 rounded-full bg-line"><span className="block h-2 rounded-full bg-slate-400" style={{ width: `${r.pct}%` }} /></span>
+                <span className="tabular-nums text-mute">{r.count} · {r.pct}%</span>
+              </li>
+            ))}
+          </ul>
         </Card>
       )}
       <p className="mt-3 text-sm text-mute">

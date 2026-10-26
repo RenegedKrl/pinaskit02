@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { canEdit, getSession } from "@/lib/session";
 import { TEMP } from "@/lib/copy";
 import { getStages, stageName } from "@/lib/stages";
@@ -32,7 +32,10 @@ export default async function Contatos({ searchParams }: { searchParams: Promise
   return (
     <>
       <PageHeader title="Contatos" desc="Pessoas que deixaram o contato pelo seu site (leads)." action={
-        <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
+        <div className="flex flex-wrap gap-2">
+          {edit && <Link href="/painel/contatos/importar" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Upload size={18} />Importar</Link>}
+          <a href={`/painel/contatos/exportar?${qs}`} className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-card px-4 font-semibold"><Download size={18} />Exportar para Excel</a>
+        </div>
       } />
       {f.ok && <p role="status" className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-800">{f.ok}</p>}
       <form data-tour="filtros" className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">

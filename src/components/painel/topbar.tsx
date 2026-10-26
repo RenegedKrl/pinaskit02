@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Home, MousePointerClick, Users, KanbanSquare, BarChart3, Settings, CreditCard, LogOut, LifeBuoy, ChevronDown } from "lucide-react";
+import { Home, MousePointerClick, Users, KanbanSquare, BarChart3, Settings, CreditCard, LogOut, LifeBuoy, ChevronDown, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -19,7 +19,7 @@ const NAV = [
 ];
 const circle = "grid size-10 place-items-center rounded-full border border-line bg-card text-ink transition-colors hover:border-primary/40 hover:text-primary";
 
-function UserMenu({ name, email, signOut }: { name: string; email: string; signOut: () => Promise<void> }) {
+function UserMenu({ name, email, signOut, superAdmin }: { name: string; email: string; signOut: () => Promise<void>; superAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -40,6 +40,7 @@ function UserMenu({ name, email, signOut }: { name: string; email: string; signO
       </button>
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-60 rounded-2xl border border-line bg-card p-2 shadow-2xl" onClick={() => setOpen(false)}>
+          {superAdmin && <Link href="/painel/admin" className={item}><Crown size={17} />Painel do dono</Link>}
           <Link href="/painel/assinatura" className={item}><CreditCard size={17} />Assinatura</Link>
           <Link href="/ajuda" className={item}><LifeBuoy size={17} />Central de ajuda</Link>
           {process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP && <SupportButton plain className={cn(item, "font-medium")} />}
@@ -52,7 +53,7 @@ function UserMenu({ name, email, signOut }: { name: string; email: string; signO
   );
 }
 
-export function Topbar({ trialText, name, email, signOut }: { trialText: string | null; name: string; email: string; signOut: () => Promise<void> }) {
+export function Topbar({ trialText, name, email, signOut, superAdmin }: { trialText: string | null; name: string; email: string; signOut: () => Promise<void>; superAdmin?: boolean }) {
   const path = usePathname();
   const active = (h: string) => (h === "/painel" ? path === h : path.startsWith(h));
   return (
@@ -73,7 +74,7 @@ export function Topbar({ trialText, name, email, signOut }: { trialText: string 
             {trialText && <Link href="/painel/assinatura" className="hidden rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary 2xl:block">{trialText}</Link>}
             <Link href="/ajuda" aria-label="Ajuda" title="Ajuda" className={cn(circle, "hidden sm:grid")}><LifeBuoy size={18} /></Link>
             <NotificationBell />
-            <UserMenu name={name} email={email} signOut={signOut} />
+            <UserMenu name={name} email={email} signOut={signOut} superAdmin={superAdmin} />
           </div>
         </div>
       </header>

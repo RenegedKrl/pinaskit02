@@ -74,6 +74,19 @@ export function mask(s: string): string {
 
 export const BOT_UA = /bot|crawl|spider|headless|preview|gptbot|claudebot|perplexity|facebookexternalhit|lighthouse/i;
 
+/**
+ * Quem recebe cada aviso. "new": dono/admins com o aviso ligado + o atendente da vez (rodízio).
+ * "daily": todos da equipe (menos quem só visualiza) com o resumo ligado.
+ */
+export async function alertEmails(workspaceId: string, kind: "new" | "daily", assignee?: string | null): Promise<string[]> {
+  const { data } = await db().from("workspace_members").select("user_id, email, role, alert_new_lead, alert_daily").eq("workspace_id", workspaceId);
+  type M = { user_id: string; email: string | null; role: string; alert_new_lead: boolean; alert_daily: boolean };
+  const pick = (m: M) => kind === "daily"
+    ? m.alert_daily && m.role !== "viewer"
+    : m.alert_new_lead && (m.role === "owner" || m.role === "admin" || m.user_id === assignee);
+  return [...new Set(((data ?? []) as M[]).filter(pick).map((m) => m.email).filter((e): e is string => !!e))];
+}
+
 /** E-mails de quem administra a conta (dono e admins): destinatários dos avisos. */
 export async function adminEmails(workspaceId: string): Promise<string[]> {
   const { data } = await db().from("workspace_members").select("email").eq("workspace_id", workspaceId).in("role", ["owner", "admin"]);

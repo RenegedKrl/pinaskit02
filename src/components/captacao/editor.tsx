@@ -5,7 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { MODES } from "@/lib/copy";
 import { cn } from "@/lib/utils";
-import type { Mode, Rules, WidgetConfig } from "@shared/widget-config";
+import { ADS_SEND_TO, type Mode, type Rules, type WidgetConfig } from "@shared/widget-config";
 import { saveWidget } from "@/app/painel/captacao/actions";
 import { Preview } from "./preview";
 
@@ -102,6 +102,8 @@ export function Editor(p: EditorProps) {
           </Field>
           <Field label="Cor principal"><div className="flex gap-2"><input type="color" aria-label="Escolher cor" value={c.color} onChange={(e) => set("color", e.target.value)} className="h-11 w-14 rounded-lg border border-line" /><Input value={c.color} onChange={(e) => set("color", e.target.value)} /></div></Field>
           <Check label="Ativo" checked={active} onChange={setActive} hint="Desligue para tirar do site sem apagar." />
+          <Check label="Distribuir entre a equipe (rodízio)" checked={c.rotation} onChange={(v) => set("rotation", v)}
+            hint="Cada contato novo vai para o próximo atendente da fila, e o WhatsApp abre no número dele. Configure quem participa em Configurações › Rodízio. Sem ninguém na fila, usa o número acima." />
         </Section>
 
         {hasButton && (
@@ -173,6 +175,37 @@ export function Editor(p: EditorProps) {
           {hasForm && <Field label="Formulário"><RulesEditor value={c.formRules} onChange={(r) => set("formRules", r)} /></Field>}
         </Section>
 
+        <Section n={7} title="Horário de atendimento" desc="Fora do horário, o balão avisa quando você volta. O contato é salvo do mesmo jeito.">
+          <Check label="Usar horário de atendimento" checked={c.hours.enabled} onChange={(v) => set("hours", { ...c.hours, enabled: v })} />
+          {c.hours.enabled && (
+            <>
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Dias de atendimento">
+                {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, i) => {
+                  const on = c.hours.days.includes(i);
+                  return <button key={d} type="button" aria-pressed={on} onClick={() => set("hours", { ...c.hours, days: on ? c.hours.days.filter((x) => x !== i) : [...c.hours.days, i].sort() })}
+                    className={cn("h-10 w-12 rounded-lg border text-sm font-semibold", on ? "border-primary bg-primary text-white" : "border-line text-mute")}>{d}</button>;
+                })}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Abre às"><Input type="time" value={c.hours.from} onChange={(e) => set("hours", { ...c.hours, from: e.target.value })} /></Field>
+                <Field label="Fecha às"><Input type="time" value={c.hours.to} onChange={(e) => set("hours", { ...c.hours, to: e.target.value })} /></Field>
+              </div>
+              <Field label="Mensagem fora do horário"><Input maxLength={160} value={c.hours.offMessage} onChange={(e) => set("hours", { ...c.hours, offMessage: e.target.value })} /></Field>
+              <p className="text-sm text-mute">Horário de Brasília.</p>
+            </>
+          )}
+        </Section>
+
+        <Section n={8} title="Conversões nos anúncios" desc="Quando alguém envia o formulário, o Pinas Kit avisa os pixels que já estão no seu site. Isso ajuda o anúncio a achar mais pessoas parecidas.">
+          <Check label="Meta (Facebook e Instagram)" checked={c.pixels.meta} onChange={(v) => set("pixels", { ...c.pixels, meta: v })} hint='Dispara o evento "Lead" no Pixel da Meta.' />
+          <Check label="Google Analytics 4" checked={c.pixels.google} onChange={(v) => set("pixels", { ...c.pixels, google: v })} hint='Dispara o evento "generate_lead".' />
+          <Field label="Rótulo de conversão do Google Ads (opcional)" hint="Formato AW-123456789/AbCdEf. Está em Google Ads › Metas › Conversões › Configuração da tag.">
+            <Input placeholder="AW-123456789/AbCdEfGh" value={c.pixels.adsSendTo} onChange={(e) => set("pixels", { ...c.pixels, adsSendTo: e.target.value.trim() })} />
+          </Field>
+          {c.pixels.adsSendTo && !ADS_SEND_TO.test(c.pixels.adsSendTo) && <p className="text-sm text-red-700">Esse rótulo não parece no formato AW-número/código.</p>}
+          <p className="text-sm text-mute">O Pinas Kit não instala os pixels: eles precisam já estar no site (ou no Google Tag Manager, que recebe o evento &quot;pinas_lead&quot;). Se o site pedir consentimento, nada é disparado sem ele.</p>
+        </Section>
+
         <details className="rounded-2xl border border-line bg-card p-5">
           <summary className="cursor-pointer font-display font-semibold">Opções avançadas</summary>
           <div className="mt-4 space-y-4">
@@ -190,6 +223,18 @@ export function Editor(p: EditorProps) {
                   <Field label="Seletor do seu formulário" hint="Ex.: #contato form. Se precisar, peça ao seu desenvolvedor.">
                     <Input value={c.form.existing.selector} onChange={(e) => setF("existing", { ...c.form.existing, selector: e.target.value })} />
                   </Field>
+                )}
+                {c.form.existing.action === "connect" && (
+                  <div className="space-y-3 rounded-xl bg-bg p-3">
+                    <p className="text-sm font-semibold">Quais campos são quais? <span className="font-normal text-mute">Deixe vazio para detectar sozinho.</span></p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {([["phone", "WhatsApp / telefone", "telefone"], ["name", "Nome", "nome"], ["email", "E-mail", "email"], ["message", "Mensagem", "mensagem"]] as const).map(([k, l, ph]) => (
+                        <Field key={k} label={l}><Input placeholder={`name do campo, ex.: ${ph}`} value={c.form.existing.map[k]}
+                          onChange={(e) => setF("existing", { ...c.form.existing, map: { ...c.form.existing.map, [k]: e.target.value } })} /></Field>
+                      ))}
+                    </div>
+                    <p className="text-sm text-mute">Use o atributo name do campo (ex.: <code>your-phone</code>) ou um seletor CSS (ex.: <code>#telefone</code>).</p>
+                  </div>
                 )}
                 <Field label="Inserir antes de (seletor CSS)" hint="Deixe vazio para entrar antes do rodapé automaticamente. Ou coloque <div data-pinas-form></div> no seu site.">
                   <Input placeholder="#rodape" value={c.form.insertBefore} onChange={(e) => setF("insertBefore", e.target.value)} />

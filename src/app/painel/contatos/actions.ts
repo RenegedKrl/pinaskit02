@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { canEdit, getSession, isAdmin } from "@/lib/session";
+import { parseMoney } from "@/lib/copy";
 
 
 /** Muda a etapa do contato. A etapa precisa existir na conta (o banco recusa as outras). */
@@ -11,10 +12,14 @@ export async function setStatus(fd: FormData): Promise<{ ok: boolean }> {
   if (!canEdit(role) || !/^[a-z0-9_]{2,40}$/.test(status)) return { ok: false };
   const { data: old } = await supabase.from("leads").select("status").eq("id", id).eq("workspace_id", workspace.id).single();
   if (!old) return { ok: false };
-  if (old.status === status) return { ok: true };
-  const { error } = await supabase.from("leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id).eq("workspace_id", workspace.id);
+  // Ao concluir: valor da venda. Ao perder: motivo. Os dois são opcionais.
+  const extra: Record<string, unknown> = {};
+  if (fd.has("deal_value")) extra.deal_value = parseMoney(String(fd.get("deal_value")));
+  if (fd.has("lost_reason")) extra.lost_reason = String(fd.get("lost_reason")).trim().slice(0, 120) || null;
+  if (old.status === status && !Object.keys(extra).length) return { ok: true };
+  const { error } = await supabase.from("leads").update({ status, ...extra, updated_at: new Date().toISOString() }).eq("id", id).eq("workspace_id", workspace.id);
   if (error) return { ok: false };
-  await supabase.from("lead_activities").insert({ workspace_id: workspace.id, lead_id: id, user_id: user.id, type: "status_change", body: { from: old.status, to: status } });
+  if (old.status !== status) await supabase.from("lead_activities").insert({ workspace_id: workspace.id, lead_id: id, user_id: user.id, type: "status_change", body: { from: old.status, to: status, ...extra } });
   // invalida todo o painel (ficha, lista, funil): sem isso a tela continuava mostrando a etapa antiga
   revalidatePath("/painel", "layout");
   return { ok: true };
@@ -24,11 +29,11 @@ export async function updateLead(fd: FormData) {
   const { supabase, workspace, role } = await getSession();
   if (!canEdit(role)) return;
   const id = String(fd.get("id"));
-  const value = String(fd.get("deal_value") || "").replace(/\./g, "").replace(",", ".");
   await supabase.from("leads").update({
     name: String(fd.get("name") || "").slice(0, 120) || null,
     email: String(fd.get("email") || "").slice(0, 200) || null,
-    deal_value: value ? Number(value) || null : null,
+    deal_value: parseMoney(String(fd.get("deal_value") || "")),
+    ...(fd.has("lost_reason") ? { lost_reason: String(fd.get("lost_reason")).trim().slice(0, 120) || null } : {}),
     updated_at: new Date().toISOString(),
   }).eq("id", id).eq("workspace_id", workspace.id);
   revalidatePath(`/painel/contatos/${id}`);

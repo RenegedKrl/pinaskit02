@@ -27,4 +27,16 @@ export const METHOD_LABEL: Record<string, string> = {
   page_form: "Formulário da página",
   connected_form: "Formulário do seu site",
   direct_link: "Link direto",
+  import: "Importado de planilha",
 };
+
+/** Motivos de perda sugeridos (a pessoa também pode escrever outro). */
+export const LOST_REASONS = ["Achou caro", "Parou de responder", "Comprou de outro", "Não era o momento", "Fora do perfil", "Só queria informação"] as const;
+
+/** "1.234,56" ou "1234.56" → 1234.56. Vazio ou inválido → null. */
+export function parseMoney(v: string): number | null {
+  const s = v.trim().replace(/[R$\s]/g, "");
+  if (!s) return null;
+  const n = Number(s.includes(",") ? s.replace(/\./g, "").replace(",", ".") : s);
+  return Number.isFinite(n) && n >= 0 && n < 1e10 ? Math.round(n * 100) / 100 : null;
+}

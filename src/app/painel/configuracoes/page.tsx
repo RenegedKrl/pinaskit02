@@ -2,6 +2,7 @@ import { canEdit, getSession, isAdmin } from "@/lib/session";
 import { cookies } from "next/headers";
 import { TemplatesManager } from "@/components/painel/templates-manager";
 import { LayoutPicker } from "@/components/painel/layout-picker";
+import { AlertsCard, RotationCard, WebhookCard } from "@/components/painel/growth-cards";
 import { Button, Card, Field, Input, PageHeader, Select } from "@/components/ui";
 import { addDomain, deleteData, invite, removeDomain, removeInvite, removeMember, saveBusiness } from "./actions";
 
@@ -12,16 +13,25 @@ export default async function Config() {
   const admin = isAdmin(role);
   const [{ data: sites }, { data: members }, { data: invites }, { data: templates }] = await Promise.all([
     supabase.from("sites").select("id, domain").eq("workspace_id", workspace.id).order("domain"),
-    supabase.from("workspace_members").select("user_id, role, email").eq("workspace_id", workspace.id),
+    supabase.from("workspace_members").select("user_id, role, email, whatsapp_e164, in_rotation, alert_new_lead, alert_daily").eq("workspace_id", workspace.id),
     admin ? supabase.from("invites").select("id, email, role").eq("workspace_id", workspace.id) : Promise.resolve({ data: [] as { id: string; email: string; role: string }[] }),
     supabase.from("message_templates").select("id, name, body").eq("workspace_id", workspace.id).order("name"),
   ]);
+  const me = members?.find((m) => m.user_id === user.id);
+  const { data: hook } = admin
+    ? await supabase.from("workspaces").select("webhook_url, webhook_secret, webhook_last_status, webhook_last_at").eq("id", workspace.id).single()
+    : { data: null };
 
   return (
     <>
       <PageHeader title="Configurações" desc="Aparência, dados do negócio, sites autorizados, equipe e mensagens prontas." />
       <div className="mb-4"><LayoutPicker current={(await cookies()).get("pk-layout")?.value === "lateral" ? "lateral" : "topo"} /></div>
       <div className="mb-4"><TemplatesManager templates={templates ?? []} edit={canEdit(role)} /></div>
+      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <AlertsCard newLead={me?.alert_new_lead ?? true} daily={me?.alert_daily ?? true} />
+        {admin && <RotationCard members={members ?? []} />}
+        {admin && <div className="lg:col-span-2"><WebhookCard url={hook?.webhook_url ?? ""} secret={hook?.webhook_secret ?? ""} lastStatus={hook?.webhook_last_status ?? null} lastAt={hook?.webhook_last_at ?? null} /></div>}
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h2 className="mb-4 font-display font-semibold">Seu negócio</h2>

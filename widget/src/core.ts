@@ -106,6 +106,24 @@ export async function sendLead(ctx: Ctx, d: LeadData): Promise<LeadAction> {
   return j.action as LeadAction;
 }
 
+type Fn = (...a: unknown[]) => void;
+/**
+ * Avisa os pixels que o site já tem (Meta, Google/GA4, Google Ads, GTM) que houve um contato.
+ * Não carrega scripts de terceiros e respeita window.PinasKitConsent === false.
+ */
+export function firePixels(cfg: WidgetConfig, method: string, w: Record<string, unknown> = window as never): string[] {
+  const p = cfg.pixels, fired: string[] = [];
+  if (w.PinasKitConsent === false) return fired;
+  const fbq = w.fbq as Fn | undefined, gtag = w.gtag as Fn | undefined, dl = w.dataLayer as unknown[] | undefined;
+  try {
+    if (p.meta && typeof fbq === "function") { fbq("track", "Lead", { content_name: method }); fired.push("meta"); }
+    if (p.google && typeof gtag === "function") { gtag("event", "generate_lead", { method }); fired.push("ga4"); }
+    if (p.adsSendTo && typeof gtag === "function") { gtag("event", "conversion", { send_to: p.adsSendTo }); fired.push("ads"); }
+    if ((p.meta || p.google || p.adsSendTo) && Array.isArray(dl)) { dl.push({ event: "pinas_lead", pinas_method: method }); fired.push("gtm"); }
+  } catch { /* pixel do site com erro não pode travar o formulário */ }
+  return fired;
+}
+
 /** Executa a ação devolvida pelo servidor. `win` é uma aba aberta no clique (evita bloqueio de pop-up). */
 export function runAction(a: LeadAction, win: Window | null): string | null {
   if ((a.type === "whatsapp" || a.type === "redirect") && a.url) {

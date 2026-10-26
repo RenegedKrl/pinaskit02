@@ -49,6 +49,48 @@ export function trialEndingEmail(to: string[], trialEndsAt: Date, appUrl: string
   };
 }
 
+export interface Digest { newLeads: number; hot: number; followupsToday: number; won: number; revenue: number; topSource: string | null }
+
+const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/** Há algo útil para contar? Sem contato ontem e sem retorno hoje, não manda e-mail vazio. */
+export function digestWorthSending(d: Digest): boolean {
+  return d.newLeads > 0 || d.followupsToday > 0 || d.won > 0;
+}
+
+/** Resumo diário: o que chegou ontem e o que fazer hoje. */
+export function dailyDigestEmail(to: string[], d: Digest, appUrl: string): Email {
+  const lines = [
+    `Ontem chegaram <b>${plural(d.newLeads, "contato", "contatos")}</b>${d.hot ? `, ${plural(d.hot, "quente", "quentes")}` : ""}.`,
+    d.topSource && d.newLeads ? `A origem que mais trouxe contatos foi <b>${esc(d.topSource)}</b>.` : "",
+    d.won ? `Você registrou <b>${plural(d.won, "venda", "vendas")}</b>${d.revenue ? ` (${brl(d.revenue)})` : ""}.` : "",
+    d.followupsToday ? `Hoje você tem <b>${plural(d.followupsToday, "retorno marcado", "retornos marcados")}</b>.` : "Nenhum retorno marcado para hoje.",
+  ].filter(Boolean);
+  const subject = `Resumo de ontem: ${plural(d.newLeads, "contato", "contatos")}${d.followupsToday ? ` · ${plural(d.followupsToday, "retorno", "retornos")} hoje` : ""}`;
+  const url = d.followupsToday ? `${appUrl}/painel/contatos?retorno=pendente` : `${appUrl}/painel`;
+  return {
+    to, subject,
+    html: layout("Seu resumo do dia", lines, { label: d.followupsToday ? "Ver retornos de hoje" : "Abrir o painel", url }),
+    text: `${lines.map((l) => l.replace(/<[^>]+>/g, "")).join("\n")}\n\nAbrir: ${url}`,
+  };
+}
+
+/** Dia 2 do teste sem instalação: um empurrão com o caminho mais curto. */
+export function installNudgeEmail(to: string[], appUrl: string): Email {
+  const url = `${appUrl}/painel/captacao`;
+  return {
+    to,
+    subject: "Falta só um passo para receber contatos",
+    html: layout("Seu botão ainda não está no site", [
+      "Você criou sua conta no Pinas Kit, mas ainda não detectamos o botão ou formulário no seu site.",
+      "Leva 2 minutos: copie a linha de código e cole antes de <code>&lt;/body&gt;</code>. Não mexe com código? Use <b>Pedir para uma IA</b> ou o link direto na bio do Instagram.",
+      "Seu teste grátis continua correndo — instale agora para aproveitar os dias que restam.",
+    ], { label: "Instalar agora", url }),
+    text: `Ainda não detectamos o Pinas Kit no seu site. Leva 2 minutos: ${url}`,
+  };
+}
+
 /** Envia pelo Resend. Sem chave configurada, só registra no log (não quebra o fluxo). */
 export async function sendEmail(e: Email): Promise<boolean> {
   const key = Deno.env.get("RESEND_API_KEY");

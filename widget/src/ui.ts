@@ -1,5 +1,6 @@
 // Renderização: campos, formulário, botão flutuante e posicionamento antes do rodapé.
-import { Ctx, LeadData, luminance, runAction, sendLead, track } from "./core";
+import { Ctx, firePixels, LeadData, luminance, runAction, sendLead, track } from "./core";
+import { isOpen } from "../../supabase/functions/_shared/widget-config";
 
 // Logo oficial do WhatsApp (contorno + telefone): sempre o mesmo, em qualquer cor de botão.
 const WA = '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>';
@@ -84,6 +85,7 @@ export function buildForm(ctx: Ctx, method: LeadData["method"], compact: boolean
         name: v("name"), phone: ddi.value + digits, email: v("email"), option: v("option"), message: v("message"),
         consent: !!consent?.checked, method, hp: v("website"),
       });
+      firePixels(ctx.cfg, method);
       const msg = runAction(a, win);
       if (msg !== null) form.innerHTML = `<p class="ok">${esc(msg)}</p>`;
       else { btn.disabled = false; btn.textContent = f.submitLabel; }
@@ -172,21 +174,33 @@ export function connectForm(ctx: Ctx) {
   let f: HTMLFormElement | null = null;
   try { f = sel ? document.querySelector<HTMLFormElement>(sel) : null; } catch { /* ignore */ }
   if (!f) return;
+  const map = ctx.cfg.form.existing.map;
+  // Campo escolhido no painel (seletor CSS ou name); sem escolha, detecta pelo tipo/nome.
+  const field = (chosen: string, auto: string) => {
+    if (chosen) {
+      try { const e = f!.querySelector<HTMLInputElement>(chosen); if (e) return e; } catch { /* não é seletor: tenta como name */ }
+      const byName = f!.querySelector<HTMLInputElement>(`[name="${chosen.replace(/["\\]/g, "")}"]`);
+      if (byName) return byName;
+    }
+    return f!.querySelector<HTMLInputElement>(auto);
+  };
   f.addEventListener("submit", () => {
-    const pick = (q: string) => (f!.querySelector<HTMLInputElement>(q)?.value || "").trim();
-    const phone = pick('input[type="tel"],input[name*="whats" i],input[name*="phone" i],input[name*="tel" i],input[name*="celular" i]').replace(/\D/g, "");
+    const pick = (chosen: string, auto: string) => (field(chosen, auto)?.value || "").trim();
+    const phone = pick(map.phone, 'input[type="tel"],input[name*="whats" i],input[name*="phone" i],input[name*="tel" i],input[name*="celular" i]').replace(/\D/g, "");
     if (phone.length < 8) return;
     sendLead(ctx, {
       method: "connected_form", phone: phone.length <= 11 ? "55" + phone : phone,
-      name: pick('input[autocomplete="name"],input[name*="name" i],input[name*="nome" i]'),
-      email: pick('input[type="email"],input[name*="mail" i]'),
-      message: pick("textarea"),
-    }).catch(() => {});
+      name: pick(map.name, 'input[autocomplete="name"],input[name*="name" i],input[name*="nome" i]'),
+      email: pick(map.email, 'input[type="email"],input[name*="mail" i]'),
+      message: pick(map.message, "textarea"),
+    }).then(() => firePixels(ctx.cfg, "connected_form")).catch(() => {});
   });
 }
 
 export function mountButton(ctx: Ctx, pageForm: HTMLElement | null) {
-  const c = ctx.cfg;
+  // Fora do horário: sem bolinha de "online" e o balão avisa quando volta (o contato é capturado igual).
+  const open_ = isOpen(ctx.cfg.hours);
+  const c = open_ ? ctx.cfg : { ...ctx.cfg, online: false, greeting: ctx.cfg.hours.offMessage || ctx.cfg.greeting };
   const side = c.position === "left" ? "left" : "right";
   const [host, root] = shadowHost("pinas-btn", css(c.color, false) + `.fab,.bal{${side}:20px}`);
   const fab = el("button", { class: "fab", "aria-label": c.label }, WA + (c.online ? '<i class="dot"></i>' : ""));

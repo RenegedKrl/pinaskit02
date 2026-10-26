@@ -27,6 +27,20 @@ export function normalize(rows: Record<string, unknown>[] | null): { rows: Repor
   return { rows: list, total };
 }
 
+/** Motivos de perda: agrupa sem diferenciar maiúsculas; sem motivo vira "Sem motivo informado". Mais frequente primeiro. */
+export function lostReasons(rows: { lost_reason: string | null }[]): { reason: string; count: number; pct: number }[] {
+  const map = new Map<string, { reason: string; count: number }>();
+  for (const r of rows) {
+    const reason = r.lost_reason?.trim() || "Sem motivo informado";
+    const k = reason.toLowerCase();
+    const cur = map.get(k) ?? { reason, count: 0 };
+    cur.count++; map.set(k, cur);
+  }
+  const total = rows.length || 1;
+  return [...map.values()].sort((a, b) => b.count - a.count || a.reason.localeCompare(b.reason))
+    .map((x) => ({ ...x, pct: Math.round((x.count / total) * 100) }));
+}
+
 /** Linha de destaque honesta: só aponta "melhor origem" com pelo menos 5 contatos e 1 venda. */
 export function bestRow(rows: ReportRow[]): ReportRow | null {
   const ok = rows.filter((r) => r.leads >= 5 && r.won > 0);

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { canEdit, getSession, isAdmin } from "@/lib/session";
-import { METHOD_LABEL, TEMP } from "@/lib/copy";
+import { LOST_REASONS, METHOD_LABEL, TEMP } from "@/lib/copy";
 import { getStages, stageName } from "@/lib/stages";
 import { dateTime, formatPhone } from "@/lib/utils";
 import { WhatsAppIcon, Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
@@ -123,6 +123,12 @@ export default async function Contato({ params }: { params: Promise<{ id: string
               <Field label="Nome"><Input name="name" defaultValue={l.name ?? ""} disabled={!edit} /></Field>
               <Field label="E-mail"><Input name="email" type="email" defaultValue={l.email ?? ""} disabled={!edit} /></Field>
               <Field label="Valor da venda (R$)" hint="Preencha quando a venda for concluída."><Input name="deal_value" inputMode="decimal" defaultValue={l.deal_value ? String(l.deal_value).replace(".", ",") : ""} disabled={!edit} /></Field>
+              {(stages.find((s) => s.key === l.status)?.kind === "lost" || l.lost_reason) && (
+                <Field label="Motivo da perda" hint="Ex.: achou caro, parou de responder, comprou de outro.">
+                  <Input name="lost_reason" list="motivos" maxLength={120} defaultValue={l.lost_reason ?? ""} disabled={!edit} />
+                  <datalist id="motivos">{LOST_REASONS.map((r) => <option key={r} value={r} />)}</datalist>
+                </Field>
+              )}
               {edit && <Button size="sm" variant="outline">Salvar</Button>}
             </form>
           </Card>

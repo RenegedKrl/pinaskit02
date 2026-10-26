@@ -7,7 +7,13 @@ Deno.serve(async (req) => {
   const w = await widgetByKey(u.searchParams.get("k"));
   if (!w || !w.is_active) return new Response("Link inválido", { status: 404 });
   const cfg = mergeConfig(w.config);
-  const target = `https://wa.me/${w.whatsapp_e164}?text=${encodeURIComponent(cfg.prefill)}`;
+  // Rodízio: o link direto também reveza entre os atendentes (sem fila configurada, usa o número do botão).
+  let phone = w.whatsapp_e164;
+  if (cfg.rotation && !BOT_UA.test(req.headers.get("user-agent") || "")) {
+    const { data } = await db().rpc("next_attendant", { p_ws: w.workspace_id });
+    phone = (Array.isArray(data) ? data[0] : data)?.whatsapp_e164 ?? phone;
+  }
+  const target = `https://wa.me/${phone}?text=${encodeURIComponent(cfg.prefill)}`;
 
   // src=w: clique já registrado pelo widget
   if (u.searchParams.get("src") !== "w" && !BOT_UA.test(req.headers.get("user-agent") || "") && (await allow(`br:${ip(req)}`, 60, 30))) {

@@ -7,6 +7,7 @@ import { Welcome } from "@/components/painel/welcome";
 import { NotificationBell } from "@/components/painel/bell";
 import { getSession, trialDaysLeft } from "@/lib/session";
 import { signOut } from "@/app/entrar/actions";
+import { isSuperAdmin } from "@/lib/admin-metrics";
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const { workspace: w, user } = await getSession();
@@ -43,7 +44,7 @@ export default async function PainelLayout({ children }: { children: React.React
   );
   return (
     <div className="min-h-dvh pb-20 md:pb-0">
-      <Topbar trialText={trialText} name={w.name ?? ""} email={user.email ?? ""} signOut={signOut} />
+      <Topbar trialText={trialText} name={w.name ?? ""} email={user.email ?? ""} signOut={signOut} superAdmin={isSuperAdmin(user.email)} />
       {content}
     </div>
   );
