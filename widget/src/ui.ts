@@ -141,7 +141,6 @@ export function mountPageForm(ctx: Ctx): HTMLElement | null {
   if (f.existing.action !== "add" && f.existing.selector) {
     try { ref = document.querySelector(f.existing.selector); } catch { /* ignore */ }
   }
-  if (f.existing.action === "connect") return null;
   const a = ref ? { node: ref, where: "before" as const, how: "substituindo formulário" } : findAnchor(f.insertBefore);
   const dark = f.theme === "dark" || (f.theme === "auto" && luminance(a.node.parentElement || document.body) < 0.45);
   const [host, root] = shadowHost("pinas-form", css(ctx.cfg.color, dark) + ":host{display:block;margin:48px auto;padding:0 16px}");

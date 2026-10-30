@@ -200,3 +200,19 @@ await run("formulário do site: usa os campos escolhidos no painel", {
   assert.equal(leads[0].phone, "5521988887777", "usou o telefone mapeado, não o primeiro tel da página");
   assert.equal(leads[0].name, "João Mapeado");
 });
+
+await run("formulário do site com ação add: escuta o form e manda a mensagem inteira", {
+  mode: "form", config: { form: { existing: { action: "add", selector: 'form[name="diagnostico"]', map: { name: '[name="nome"]', phone: '[name="whatsapp"]', email: '[name="email"]', message: '[name="resumo"]' } } } },
+  body: `<form name="diagnostico" onsubmit="event.preventDefault()"><input name="nome" value="Ana"><input name="whatsapp" value="(11) 97777-6666"><input name="email" value="ana@ex.com"><textarea name="resumo" hidden>Linha 1
+Linha 2
+${"x".repeat(600)}</textarea><button>Enviar</button></form>`,
+}, async ({ page, leads }) => {
+  assert.equal(await page.locator("#pinas-form").count(), 0, "não coloca o formulário do Pinas Kit");
+  await page.locator("form button").click();
+  await page.waitForTimeout(500);
+  assert.equal(leads.length, 1);
+  assert.equal(leads[0].method, "connected_form");
+  assert.equal(leads[0].phone, "5511977776666");
+  assert.equal(leads[0].email, "ana@ex.com");
+  assert.ok(leads[0].message.includes("Linha 2") && leads[0].message.length > 600, "mensagem completa, com várias linhas");
+});

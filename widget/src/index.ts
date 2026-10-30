@@ -28,7 +28,9 @@ declare global { interface Window { __pinas?: boolean; PinasKitConsent?: boolean
         if (found.length) track(ctx, "form_detected", { existing: found.length, ids: found.slice(0, 5).map((f) => f.id || f.getAttribute("name") || "") });
         let page: HTMLElement | null = null;
         if (d.mode !== "button" && d.capture && rulesPass(ctx.cfg.formRules)) {
-          if (ctx.cfg.form.existing.action === "connect") connectForm(ctx);
+          const ex = ctx.cfg.form.existing;
+          // Com seletor e sem "replace": só escuta o formulário do site ("connect" é o valor antigo).
+          if (ex.selector && ex.action !== "replace") connectForm(ctx);
           else page = mountPageForm(ctx);
         }
         if (d.mode !== "form" && rulesPass(ctx.cfg.buttonRules)) mountButton(ctx, page);

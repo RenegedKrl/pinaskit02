@@ -46,3 +46,5 @@ Fase 1 — código do MVP escrito. Falta: subir no Supabase/Vercel e testar com 
 
 ## Pendências do dono
 - Asaas PRODUÇÃO ligado 24/10 (conta pessoa física): chave no .env.local e no Supabase; Vercel trocada e webhook de produção conferido (5 eventos). Falta: teste de cobrança real (adiado), trocar a chave (vazou no chat), confirmar webhook do sandbox desligado. Contas criadas no sandbox (poguerio9) têm IDs que não existem em produção · domínio do Pinas Kit · apagar teste no CentralKit · mover MOVER-PARA-.claude-settings.json para .claude/settings.json
+
+- Formulário do seu site (etapa 4): seletor com validação, ação add/replace e mapa de campos opcional (`src/components/captacao/site-form.tsx`). No widget, seletor + "add" agora escuta o form do site (antes exigia "connect", que segue aceito). Teste e2e do caso PINAS.studio.

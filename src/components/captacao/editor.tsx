@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { ADS_SEND_TO, type Mode, type Rules, type WidgetConfig } from "@shared/widget-config";
 import { saveWidget } from "@/app/painel/captacao/actions";
 import { Preview } from "./preview";
+import { SiteForm, validSelector } from "./site-form";
 
 export interface EditorProps { id: string | null; name: string; mode: Mode; whatsapp: string; isActive: boolean; config: WidgetConfig }
 
@@ -73,6 +74,7 @@ export function Editor(p: EditorProps) {
 
   const save = () => start(async () => {
     setMsg(null);
+    if (!validSelector(c.form.existing.selector)) return setMsg({ ok: false, text: "O seletor do formulário do site não é válido." });
     const r = await saveWidget(p.id, { name, mode, whatsapp, is_active: active, config: c });
     if (r.error) return setMsg({ ok: false, text: r.error });
     setMsg({ ok: true, text: p.id ? "Alterações salvas. Seu site atualiza em até 1 minuto." : "Pronto! Agora instale no seu site." });
@@ -158,6 +160,7 @@ export function Editor(p: EditorProps) {
                 <Field label="Largura"><Select value={c.form.width} onChange={(e) => setF("width", e.target.value as "narrow")}><option value="narrow">Centralizado (até 640 px)</option><option value="content">Igual ao conteúdo do site</option></Select></Field>
               </div>
             )}
+            <SiteForm value={c.form.existing} onChange={(v) => setF("existing", v)} />
           </Section>
         )}
 
@@ -212,30 +215,6 @@ export function Editor(p: EditorProps) {
             {hasButton && <Field label="Mensagem do link direto" hint="Usada quando a pessoa abre o WhatsApp sem preencher formulário."><Input value={c.prefill} onChange={(e) => set("prefill", e.target.value)} /></Field>}
             {hasForm && (
               <>
-                <Field label="Seu site já tem um formulário?">
-                  <Select value={c.form.existing.action} onChange={(e) => setF("existing", { ...c.form.existing, action: e.target.value as "add" })}>
-                    <option value="add">Adicionar o do Pinas Kit também</option>
-                    <option value="replace">Trocar o meu pelo do Pinas Kit</option>
-                    <option value="connect">Manter o meu e conectar ao Pinas Kit</option>
-                  </Select>
-                </Field>
-                {c.form.existing.action !== "add" && (
-                  <Field label="Seletor do seu formulário" hint="Ex.: #contato form. Se precisar, peça ao seu desenvolvedor.">
-                    <Input value={c.form.existing.selector} onChange={(e) => setF("existing", { ...c.form.existing, selector: e.target.value })} />
-                  </Field>
-                )}
-                {c.form.existing.action === "connect" && (
-                  <div className="space-y-3 rounded-xl bg-bg p-3">
-                    <p className="text-sm font-semibold">Quais campos são quais? <span className="font-normal text-mute">Deixe vazio para detectar sozinho.</span></p>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {([["phone", "WhatsApp / telefone", "telefone"], ["name", "Nome", "nome"], ["email", "E-mail", "email"], ["message", "Mensagem", "mensagem"]] as const).map(([k, l, ph]) => (
-                        <Field key={k} label={l}><Input placeholder={`name do campo, ex.: ${ph}`} value={c.form.existing.map[k]}
-                          onChange={(e) => setF("existing", { ...c.form.existing, map: { ...c.form.existing.map, [k]: e.target.value } })} /></Field>
-                      ))}
-                    </div>
-                    <p className="text-sm text-mute">Use o atributo name do campo (ex.: <code>your-phone</code>) ou um seletor CSS (ex.: <code>#telefone</code>).</p>
-                  </div>
-                )}
                 <Field label="Inserir antes de (seletor CSS)" hint="Deixe vazio para entrar antes do rodapé automaticamente. Ou coloque <div data-pinas-form></div> no seu site.">
                   <Input placeholder="#rodape" value={c.form.insertBefore} onChange={(e) => setF("insertBefore", e.target.value)} />
                 </Field>
